@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'sua_chave_secreta_super_segura_aqui' # Mude isso em produção!
+app.config['SECRET_KEY'] = 'sua_chave_secreta_super_segura_aqui'  # Mude isso em produção!
 
 # Configuração do banco de dados
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login' # Redireciona para /login se tentar acessar área restrita
+login_manager.login_view = 'login'
 
 # ==========================================
 # MODELOS DO BANCO DE DADOS
@@ -30,7 +30,6 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(200), nullable=False)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relação: um usuário tem muitas palavras
     palavras = db.relationship('Palavra', backref='dono', lazy=True, cascade='all, delete-orphan')
     
     def set_password(self, password):
@@ -42,7 +41,7 @@ class User(UserMixin, db.Model):
 class Palavra(db.Model):
     """Tabela de palavras"""
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # DONO DA PALAVRA
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     palavra = db.Column(db.String(100), nullable=False, index=True)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     traducoes = db.relationship('Traducao', backref='palavra_obj', lazy=True, cascade='all, delete-orphan')
@@ -71,38 +70,49 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # ==========================================
-# FUNÇÕES DE TRADUÇÃO
+# FUNÇÃO DE TRADUÇÃO (ABERTA PARA TODOS)
 # ==========================================
 
 def traduzir_com_fallback(palavra_texto, idioma_alvo):
-    # Busca APENAS nas palavras do usuário atual
-    palavra_obj = Palavra.query.filter_by(palavra=palavra_texto, user_id=current_user.id).first()
+    """
+    Traduz a palavra. Se o usuário estiver logado, salva no banco.
+    Se não estiver, apenas retorna a tradução da API.
+    """
+    # 1. Se estiver logado, tenta buscar no banco pessoal
+    if current_user.is_authenticated:
+        palavra_obj = Palavra.query.filter_by(palavra=palavra_texto, user_id=current_user.id).first()
+        
+        if palavra_obj:
+            for trad in palavra_obj.traducoes:
+                if trad.idioma == idioma_alvo:
+                    return {"traducao": trad.traducao, "fonte": "📚 Seu Dicionário"}
     
-    if palavra_obj:
-        for trad in palavra_obj.traducoes:
-            if trad.idioma == idioma_alvo:
-                return {"traducao": trad.traducao, "fonte": "📚 Seu Dicionário"}
-    
+    # 2. Consulta a API do Google Translate
     try:
         resultado = GoogleTranslator(source='pt', target=idioma_alvo).translate(palavra_texto)
         if not resultado:
             return {"traducao": None, "fonte": "❌ Não foi possível traduzir"}
         
-        if not palavra_obj:
-            palavra_obj = Palavra(palavra=palavra_texto, user_id=current_user.id)
-            db.session.add(palavra_obj)
-            db.session.flush()
-        
-        trad_existente = Traducao.query.filter_by(palavra_id=palavra_obj.id, idioma=idioma_alvo).first()
-        if trad_existente:
-            trad_existente.traducao = resultado
+        # 3. Se estiver logado, salva no banco automaticamente
+        if current_user.is_authenticated:
+            if not palavra_obj:
+                palavra_obj = Palavra(palavra=palavra_texto, user_id=current_user.id)
+                db.session.add(palavra_obj)
+                db.session.flush()
+            
+            trad_existente = Traducao.query.filter_by(palavra_id=palavra_obj.id, idioma=idioma_alvo).first()
+            if trad_existente:
+                trad_existente.traducao = resultado
+            else:
+                db.session.add(Traducao(palavra_id=palavra_obj.id, idioma=idioma_alvo, traducao=resultado))
+            
+            db.session.commit()
+            return {"traducao": resultado, "fonte": "🌐 Google Translate (salvo no seu dicionário!)"}
         else:
-            db.session.add(Traducao(palavra_id=palavra_obj.id, idioma=idioma_alvo, traducao=resultado))
-        
-        db.session.commit()
-        return {"traducao": resultado, "fonte": "🌐 Google Translate (salvo!)"}
+            # Se NÃO estiver logado, apenas retorna sem salvar
+            return {"traducao": resultado, "fonte": "🌐 Google Translate (faça login para salvar!)"}
+            
     except Exception as e:
-        db.session.rollback()
         return {"traducao": None, "fonte": f"❌ Erro na API: {str(e)}"}
 
 # ==========================================
@@ -150,24 +160,33 @@ def logout():
     return jsonify({"sucesso": True})
 
 # ==========================================
-# ROTAS DO APLICATIVO (PROTEGIDAS)
+# ROTAS DO APLICATIVO
 # ==========================================
 
 @app.route('/')
-@login_required
 def index():
-    palavras = Palavra.query.filter_by(user_id=current_user.id).order_by(Palavra.palavra).all()
-    return render_template('index.html', palavras=[p.palavra for p in palavras])
+    """Página principal - visível para todos"""
+    if current_user.is_authenticated:
+        palavras = Palavra.query.filter_by(user_id=current_user.id).order_by(Palavra.palavra).all()
+        return render_template('index.html', palavras=[p.palavra for p in palavras])
+    return render_template('index.html', palavras=[])
 
 @app.route('/traduzir', methods=['POST'])
-@login_required
 def traduzir():
+    """Qualquer pessoa pode traduzir, mas só logados salvam."""
     dados = request.get_json()
-    return jsonify(traduzir_com_fallback(dados.get('palavra', '').strip(), dados.get('idioma', '').strip()))
+    palavra = dados.get('palavra', '').strip()
+    idioma = dados.get('idioma', '').strip()
+    
+    if not palavra or not idioma:
+        return jsonify({"erro": "Preencha todos os campos"}), 400
+    
+    return jsonify(traduzir_com_fallback(palavra, idioma))
 
 @app.route('/adicionar', methods=['POST'])
 @login_required
 def adicionar():
+    """Apenas usuários logados podem adicionar manualmente."""
     dados = request.get_json()
     palavra_texto = dados.get('palavra', '').strip()
     idioma = dados.get('idioma', '').strip()
@@ -194,6 +213,7 @@ def adicionar():
 @app.route('/remover', methods=['POST'])
 @login_required
 def remover():
+    """Apenas usuários logados podem remover."""
     dados = request.get_json()
     palavra_texto = dados.get('palavra', '').strip()
     
@@ -207,15 +227,21 @@ def remover():
 @app.route('/listar')
 @login_required
 def listar():
+    """Apenas usuários logados podem listar."""
     palavras = Palavra.query.filter_by(user_id=current_user.id).order_by(Palavra.palavra).all()
     return jsonify([p.to_dict() for p in palavras])
 
 @app.route('/api/palavras')
 @login_required
 def api_palavras():
+    """Apenas usuários logados podem buscar."""
     query = request.args.get('q', '').strip()
-    if len(query) < 2: return jsonify([])
-    palavras = Palavra.query.filter(Palavra.user_id == current_user.id, Palavra.palavra.ilike(f'%{query}%')).limit(10).all()
+    if len(query) < 2:
+        return jsonify([])
+    palavras = Palavra.query.filter(
+        Palavra.user_id == current_user.id, 
+        Palavra.palavra.ilike(f'%{query}%')
+    ).limit(10).all()
     return jsonify([p.palavra for p in palavras])
 
 # ==========================================
