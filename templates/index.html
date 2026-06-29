@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Dicionário Web</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab {
+            flex: 1; padding: 12px; border: none; background: #f0f0f0;
+            cursor: pointer; border-radius: 10px; font-weight: bold;
+            transition: all 0.3s;
+        }
+        .tab.active { background: #667eea; color: white; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #555; font-weight: 600; }
+        input, select {
+            width: 100%; padding: 12px; border: 2px solid #e0e0e0;
+            border-radius: 8px; font-size: 16px; transition: border 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: #667eea; }
+        button.submit {
+            width: 100%; padding: 14px; background: #667eea; color: white;
+            border: none; border-radius: 8px; font-size: 16px; font-weight: bold;
+            cursor: pointer; transition: background 0.3s;
+        }
+        button.submit:hover { background: #5568d3; }
+        .resultado {
+            margin-top: 20px; padding: 20px; background: #f8f9fa;
+            border-radius: 10px; border-left: 4px solid #667eea;
+            display: none;
+        }
+        .resultado.show { display: block; }
+        .resultado h3 { color: #333; margin-bottom: 10px; }
+        .fonte { font-size: 12px; color: #888; margin-top: 8px; font-style: italic; }
+        .painel { display: none; }
+        .painel.active { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 Dicionário Web</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="mudarPainel('traduzir')">🔍 Traduzir</button>
+            <button class="tab" onclick="mudarPainel('adicionar')">➕ Adicionar</button>
+        </div>
+
+        <!-- PAINEL DE TRADUÇÃO -->
+        <div id="painel-traduzir" class="painel active">
+            <div class="form-group">
+                <label>Palavra em Português</label>
+                <input type="text" id="palavra-traduzir" placeholder="Ex: Computador">
+            </div>
+            <div class="form-group">
+                <label>Idioma Alvo</label>
+                <select id="idioma-traduzir">
+                    <option value="en">🇺🇸 Inglês (en)</option>
+                    <option value="es">🇪🇸 Espanhol (es)</option>
+                    <option value="fr">🇫🇷 Francês (fr)</option>
+                    <option value="de">🇩🇪 Alemão (de)</option>
+                    <option value="it">🇮🇹 Italiano (it)</option>
+                </select>
+            </div>
+            <button class="submit" onclick="fazerTraducao()">Traduzir</button>
+            
+            <div id="resultado-traducao" class="resultado">
+                <h3 id="texto-traducao"></h3>
+                <p class="fonte" id="fonte-traducao"></p>
+            </div>
+        </div>
+
+        <!-- PAINEL DE ADICIONAR -->
+        <div id="painel-adicionar" class="painel">
+            <div class="form-group">
+                <label>Palavra em Português</label>
+                <input type="text" id="palavra-adicionar" placeholder="Ex: Programação">
+            </div>
+            <div class="form-group">
+                <label>Idioma</label>
+                <select id="idioma-adicionar">
+                    <option value="en">🇺🇸 Inglês (en)</option>
+                    <option value="es">🇪🇸 Espanhol (es)</option>
+                    <option value="fr">🇫🇷 Francês (fr)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tradução</label>
+                <input type="text" id="traducao-adicionar" placeholder="Ex: Programming">
+            </div>
+            <button class="submit" onclick="fazerAdicao()">Adicionar ao Dicionário</button>
+            
+            <div id="resultado-adicao" class="resultado">
+                <h3 id="texto-adicao"></h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mudarPainel(painel) {
+            document.querySelectorAll('.painel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('painel-' + painel).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function fazerTraducao() {
+            const palavra = document.getElementById('palavra-traduzir').value;
+            const idioma = document.getElementById('idioma-traduzir').value;
+            
+            const resposta = await fetch('/traduzir', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({palavra, idioma})
+            });
+            
+            const dados = await resposta.json();
+            const resultado = document.getElementById('resultado-traducao');
+            
+            if (dados.erro) {
+                document.getElementById('texto-traducao').textContent = '❌ ' + dados.erro;
+                document.getElementById('fonte-traducao').textContent = '';
+            } else {
+                document.getElementById('texto-traducao').textContent = 
+                    `"${palavra}" → "${dados.traducao}"`;
+                document.getElementById('fonte-traducao').textContent = dados.fonte;
+            }
+            resultado.classList.add('show');
+        }
+
+        async function fazerAdicao() {
+            const palavra = document.getElementById('palavra-adicionar').value;
+            const idioma = document.getElementById('idioma-adicionar').value;
+            const traducao = document.getElementById('traducao-adicionar').value;
+            
+            const resposta = await fetch('/adicionar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({palavra, idioma, traducao})
+            });
+            
+            const dados = await resposta.json();
+            const resultado = document.getElementById('resultado-adicao');
+            
+            if (dados.erro) {
+                document.getElementById('texto-adicao').textContent = '❌ ' + dados.erro;
+            } else {
+                document.getElementById('texto-adicao').textContent = '✅ ' + dados.sucesso;
+            }
+            resultado.classList.add('show');
+        }
+    </script>
+</body>
+</html>

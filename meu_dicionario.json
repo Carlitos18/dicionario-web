@@ -1,0 +1,24 @@
+{
+    "Olá": {
+        "en": "Hello",
+        "es": "Hola"
+    },
+    "Obrigado": {
+        "en": "Thank you",
+        "es": "Gracias"
+    },
+    "Computador": {
+        "en": "Computer",
+        "es": "Ordenador"
+    },
+    "Macaco": {
+        "es": "Mono",
+        "en": "Monkey"
+    },
+    "Minoria": {
+        "en": "Minority"
+    },
+    "água": {
+        "de": "Wasser"
+    }
+}
