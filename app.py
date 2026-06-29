@@ -74,57 +74,80 @@ def load_user(user_id):
 GRAMMAR_RULES = [
     {
         "idioma": "en",
-        "titulo": "🇺🇸 Make vs Do",
+        "titulo": "🇺 Make vs Do",
         "resumo": "Diferença fundamental entre criar e agir.",
-        "conteudo": "<p><strong>Make</strong> é usado para criar, construir ou produzir algo:</p><ul><li>Make a cake (fazer um bolo)</li><li>Make a decision (tomar uma decisão)</li><li>Make money (ganhar dinheiro)</li></ul><p style='margin-top:10px'><strong>Do</strong> é usado para ações e atividades:</p><ul><li>Do homework (fazer lição de casa)</li><li>Do exercise (fazer exercício)</li><li>Do your best (fazer o seu melhor)</li></ul>"
+        "conteudo": "<p><strong>Make</strong> é usado para criar, construir ou produzir algo:</p><ul><li>Make a cake (fazer um bolo)</li><li>Make a decision (tomar uma decisão)</li></ul><p style='margin-top:10px'><strong>Do</strong> é usado para ações e atividades:</p><ul><li>Do homework (fazer lição de casa)</li><li>Do exercise (fazer exercício)</li></ul>",
+        "quiz": {
+            "pergunta": "Qual frase está gramaticalmente correta?",
+            "opcoes": ["I need to do a cake for the party.", "I need to make a cake for the party.", "I need to make my homework."],
+            "correta": 1 # O índice da resposta certa (0, 1 ou 2)
+        }
     },
     {
         "idioma": "en",
         "titulo": "🇺🇸 Present Perfect",
         "resumo": "Ações passadas com relevância no presente.",
-        "conteudo": "<p>Usado para ações que começaram no passado e continuam no presente.</p><p style='margin-top:10px'><strong>Estrutura:</strong> Sujeito + have/has + verbo no particípio</p><ul><li>I <strong>have studied</strong> English for 5 years.</li><li>She <strong>has visited</strong> Paris twice.</li><li>They <strong>have just finished</strong> the project.</li></ul>"
+        "conteudo": "<p>Usado para ações que começaram no passado e continuam no presente.</p><p style='margin-top:10px'><strong>Estrutura:</strong> Sujeito + have/has + verbo no particípio</p><ul><li>I <strong>have studied</strong> English for 5 years.</li><li>She <strong>has visited</strong> Paris twice.</li></ul>",
+        "quiz": {
+            "pergunta": "Complete a frase: 'She ___ to London three times.'",
+            "opcoes": ["have been", "has been", "was"],
+            "correta": 1
+        }
     },
     {
         "idioma": "en",
-        "titulo": "🇸 Since vs For",
+        "titulo": "🇺🇸 Since vs For",
         "resumo": "Como falar de duração no tempo.",
-        "conteudo": "<p>Ambos são usados com o Present Perfect:</p><ul><li><strong>Since</strong> (Desde): Indica o ponto de início. (Since 2010, Since Monday)</li><li><strong>For</strong> (Por/Durante): Indica o período total. (For 5 years, For 2 hours)</li></ul><p><strong>Exemplo:</strong> I have lived here <strong>since</strong> 2015. I have lived here <strong>for</strong> 9 years.</p>"
+        "conteudo": "<p>Ambos são usados com o Present Perfect:</p><ul><li><strong>Since</strong> (Desde): Indica o ponto de início. (Since 2010)</li><li><strong>For</strong> (Por/Durante): Indica o período total. (For 5 years)</li></ul>",
+        "quiz": {
+            "pergunta": "Qual opção completa corretamente: 'I have lived here ___ 2015.'",
+            "opcoes": ["for", "since", "ago"],
+            "correta": 1
+        }
     },
     {
         "idioma": "es",
         "titulo": "🇪🇸 Ser vs Estar",
         "resumo": "O dilema clássico do espanhol.",
-        "conteudo": "<p><strong>Ser</strong> para características permanentes:</p><ul><li>Soy alto (sou alto)</li><li>Es médico (é médico)</li><li>Son amigos (são amigos)</li></ul><p style='margin-top:10px'><strong>Estar</strong> para estados temporários e localização:</p><ul><li>Estoy cansado (estou cansado)</li><li>Está en casa (está em casa)</li><li>Estamos felizes (estamos felizes)</li></ul>"
+        "conteudo": "<p><strong>Ser</strong> para características permanentes:</p><ul><li>Soy alto (sou alto)</li><li>Es médico (é médico)</li></ul><p style='margin-top:10px'><strong>Estar</strong> para estados temporários e localização:</p><ul><li>Estoy cansado (estou cansado)</li><li>Está en casa (está em casa)</li></ul>",
+        "quiz": {
+            "pergunta": "Como se diz 'Estou cansado' em espanhol?",
+            "opcoes": ["Soy cansado", "Estoy cansado", "Tengo cansado"],
+            "correta": 1
+        }
     },
     {
         "idioma": "es",
-        "titulo": "🇪 Por vs Para",
+        "titulo": "🇪🇸 Por vs Para",
         "resumo": "Preposições que confundem todos.",
-        "conteudo": "<p><strong>Para</strong> indica destino, propósito, prazo:</p><ul><li>Este regalo es <strong>para</strong> ti.</li><li>Estudio <strong>para</strong> aprender.</li><li>La tarea es <strong>para</strong> mañana.</li></ul><p style='margin-top:10px'><strong>Por</strong> indica causa, motivo, troca:</p><ul><li>Gracias <strong>por</strong> la ayuda.</li><li>Caminamos <strong>por</strong> el parque.</li><li>Te cambio mi manzana <strong>por</strong> tu naranja.</li></ul>"
+        "conteudo": "<p><strong>Para</strong> indica destino, propósito, prazo:</p><ul><li>Este regalo es <strong>para</strong> ti.</li></ul><p style='margin-top:10px'><strong>Por</strong> indica causa, motivo, troca:</p><ul><li>Gracias <strong>por</strong> la ayuda.</li></ul>",
+        "quiz": {
+            "pergunta": "Complete: 'Este regalo es ___ ti.' (destinatário)",
+            "opcoes": ["por", "para", "a"],
+            "correta": 1
+        }
     },
     {
         "idioma": "fr",
         "titulo": "🇫🇷 Artigos Definidos",
         "resumo": "Como usar 'O' e 'A' em francês.",
-        "conteudo": "<ul><li><strong>le</strong> (masculino singular): le livre (o livro)</li><li><strong>la</strong> (feminino singular): la maison (a casa)</li><li><strong>l'</strong> (antes de vogal): l'ami (o amigo)</li><li><strong>les</strong> (plural): les enfants (as crianças)</li></ul>"
-    },
-    {
-        "idioma": "fr",
-        "titulo": "🇫🇷 Être vs Avoir",
-        "resumo": "Os dois pilares do francês.",
-        "conteudo": "<p><strong>Être</strong> (Ser/Estar) para descrições e localização:</p><ul><li>Je <strong>suis</strong> content.</li><li>Il <strong>est</strong> professeur.</li></ul><p style='margin-top:10px'><strong>Avoir</strong> (Ter) para posse, idade e sensações:</p><ul><li>J'<strong>ai</strong> un chat.</li><li>J'<strong>ai</strong> 25 ans.</li><li>J'<strong>ai</strong> faim.</li></ul>"
+        "conteudo": "<ul><li><strong>le</strong> (masculino singular): le livre</li><li><strong>la</strong> (feminino singular): la maison</li><li><strong>l'</strong> (antes de vogal): l'ami</li><li><strong>les</strong> (plural): les enfants</li></ul>",
+        "quiz": {
+            "pergunta": "Qual o artigo correto para 'maison' (casa - feminino)?",
+            "opcoes": ["le maison", "la maison", "les maison"],
+            "correta": 1
+        }
     },
     {
         "idioma": "pt",
-        "titulo": "🇷 Crase: A Regra de Ouro",
+        "titulo": "🇧🇷 Crase: A Regra de Ouro",
         "resumo": "Nunca mais erre o uso da crase.",
-        "conteudo": "<p>Substitua a palavra feminina por uma masculina. Se aparecer <strong>'ao'</strong>, então tem crase:</p><ul><li>Vou <strong>à</strong> escola -> Vou <strong>ao</strong> colégio. (Tem crase!)</li><li>Vou <strong>a</strong> pé -> Vou <strong>a</strong> cavalo. (Não tem crase!)</li><li>Entreguei <strong>à</strong> diretora -> Entreguei <strong>ao</strong> diretor. (Tem crase!)</li></ul>"
-    },
-    {
-        "idioma": "pt",
-        "titulo": "🇧🇷 Mas vs Mais",
-        "resumo": "Oposição vs Quantidade.",
-        "conteudo": "<p><strong>Mas</strong> indica oposição (pode ser trocado por 'porém'):</p><ul><li>Estudei muito, <strong>mas</strong> não passei.</li><li>Ele é rico, <strong>mas</strong> é infeliz.</li></ul><p style='margin-top:10px'><strong>Mais</strong> indica quantidade (oposto de 'menos'):</p><ul><li>Eu quero <strong>mais</strong> café.</li><li>Ela é a <strong>mais</strong> inteligente da turma.</li></ul>"
+        "conteudo": "<p>Substitua a palavra feminina por uma masculina. Se aparecer <strong>'ao'</strong>, então tem crase:</p><ul><li>Vou <strong>à</strong> escola -> Vou <strong>ao</strong> colégio. (Tem crase!)</li><li>Vou <strong>a</strong> pé -> Vou <strong>a</strong> cavalo. (Não tem crase!)</li></ul>",
+        "quiz": {
+            "pergunta": "Em qual frase o uso da crase está CORRETO?",
+            "opcoes": ["Vou à pé para casa.", "Entreguei o livro à ela.", "Fui à praia no domingo."],
+            "correta": 2
+        }
     }
 ]
 

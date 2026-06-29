@@ -91,6 +91,67 @@
         .gramatica-card ul { margin-left: 20px; margin-top: 10px; color: var(--text-secondary); }
         .gramatica-card li { margin-bottom: 5px; }
         
+        /* Estilos do Mini-Teste (Quiz) */
+        .quiz-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed var(--border-color);
+        }
+        .quiz-section h4 {
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .quiz-pergunta {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+        .quiz-opcoes {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .quiz-btn {
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 14px;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+        .quiz-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        .quiz-btn.correta {
+            border-color: var(--success);
+            background: rgba(72, 187, 120, 0.15);
+            color: var(--success);
+            font-weight: bold;
+        }
+        .quiz-btn.errada {
+            border-color: var(--error);
+            background: rgba(245, 101, 101, 0.15);
+            color: var(--error);
+            opacity: 0.7;
+        }
+        .quiz-btn:disabled {
+            cursor: default;
+        }
+        .quiz-feedback {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
         @media (max-width: 768px) {
             .container { padding: 20px; }
             h1 { font-size: 24px; }
@@ -498,6 +559,81 @@
         document.getElementById('modal-auth').addEventListener('click', function(e) {
             if (e.target === this) fecharModal();
         });
+
+                function renderizarGramatica() {
+            const container = document.getElementById('lista-gramatica');
+            const termoBusca = document.getElementById('buscar-gramatica').value.toLowerCase().trim();
+            
+            const regrasFiltradas = todasRegras.filter(regra => {
+                const correspondeIdioma = filtroIdiomaAtual === 'all' || regra.idioma === filtroIdiomaAtual;
+                const textoBusca = `${regra.titulo} ${regra.resumo}`.toLowerCase();
+                const correspondeBusca = termoBusca === '' || textoBusca.includes(termoBusca);
+                return correspondeIdioma && correspondeBusca;
+            });
+
+            if (regrasFiltradas.length === 0) {
+                container.innerHTML = '<p class="empty-state">Nenhuma regra encontrada com esses filtros.</p>';
+                return;
+            }
+
+            container.innerHTML = regrasFiltradas.map(regra => {
+                // Lógica do Quiz (se existir)
+                let quizHTML = '';
+                if (regra.quiz) {
+                    const opcoesHTML = regra.quiz.opcoes.map((opcao, index) => 
+                        `<button class="quiz-btn" onclick="event.stopPropagation(); verificarResposta(this, ${index}, ${regra.quiz.correta})">${opcao}</button>`
+                    ).join('');
+                    
+                    quizHTML = `
+                        <div class="quiz-section">
+                            <h4>✏️ Teste Rápido:</h4>
+                            <p class="quiz-pergunta">${regra.quiz.pergunta}</p>
+                            <div class="quiz-opcoes">
+                                ${opcoesHTML}
+                            </div>
+                            <div class="quiz-feedback"></div>
+                        </div>
+                    `;
+                }
+
+                // Retorna o cartão completo
+                return `
+                    <div class="gramatica-card" onclick="this.classList.toggle('expanded')">
+                        <div class="gramatica-header">
+                            <h3>${regra.titulo}</h3>
+                            <span class="toggle-icon">▼</span>
+                        </div>
+                        <div class="gramatica-body">
+                            <p style="font-style: italic; margin-bottom: 15px; color: var(--accent);">${regra.resumo}</p>
+                            ${regra.conteudo}
+                            ${quizHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+                function verificarResposta(btn, selecionada, correta) {
+            // Evita que o clique no botão feche o acordeão (graças ao stopPropagation no HTML)
+            const quizSection = btn.closest('.quiz-section');
+            const botoes = quizSection.querySelectorAll('.quiz-btn');
+            const feedback = quizSection.querySelector('.quiz-feedback');
+
+            // Desabilita todos os botões após a primeira tentativa
+            botoes.forEach(b => b.disabled = true);
+
+            if (selecionada === correta) {
+                btn.classList.add('correta');
+                feedback.textContent = '✅ Parabéns! Resposta correta!';
+                feedback.style.color = 'var(--success)';
+            } else {
+                btn.classList.add('errada');
+                // Destaca a resposta certa para o usuário aprender
+                botoes[correta].classList.add('correta');
+                feedback.textContent = '❌ Ops! A resposta correta está destacada em verde.';
+                feedback.style.color = 'var(--error)';
+            }
+        }
     </script>
 </body>
 </html>
