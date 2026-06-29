@@ -3,738 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌍 Dicionário Web Pro</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title> Dicionário Web Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --bg-card: rgba(255, 255, 255, 0.95);
-            --text-primary: #1a202c;
-            --text-secondary: #4a5568;
-            --text-muted: #718096;
-            --border-color: #e2e8f0;
-            --input-bg: #ffffff;
-            --input-border: #cbd5e0;
-            --accent: #667eea;
-            --accent-hover: #5568d3;
-            --success: #48bb78;
-            --error: #f56565;
+            --text-primary: #1a202c; --text-secondary: #4a5568; --text-muted: #718096;
+            --border-color: #e2e8f0; --input-bg: #ffffff; --input-border: #cbd5e0;
+            --accent: #667eea; --accent-hover: #5568d3; --success: #48bb78; --error: #f56565;
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
         [data-theme="dark"] {
             --bg-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             --bg-card: rgba(30, 30, 46, 0.95);
-            --text-primary: #f7fafc;
-            --text-secondary: #cbd5e0;
-            --text-muted: #a0aec0;
-            --border-color: #2d3748;
-            --input-bg: #2d3748;
-            --input-border: #4a5568;
-            --accent: #7c9cff;
-            --accent-hover: #667eea;
-            --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --text-primary: #f7fafc; --text-secondary: #cbd5e0; --text-muted: #a0aec0;
+            --border-color: #2d3748; --input-bg: #2d3748; --input-border: #4a5568;
+            --accent: #7c9cff; --accent-hover: #667eea;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg-primary);
-            min-height: 100vh;
-            padding: 20px;
-            color: var(--text-primary);
-            transition: background 0.3s ease;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--bg-card);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: var(--shadow);
-            animation: slideUp 0.5s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--accent) 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .theme-toggle {
-            background: var(--input-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            transform: rotate(180deg);
-            border-color: var(--accent);
-        }
-
-        .subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .stats {
-            background: var(--input-bg);
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 30px;
-            text-align: center;
-            border: 2px solid var(--border-color);
-            transition: all 0.3s ease;
-        }
-
-        .stats:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .stats strong {
-            color: var(--accent);
-            font-size: 32px;
-            font-weight: 700;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .stats span {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            background: var(--input-bg);
-            padding: 6px;
-            border-radius: 12px;
-            border: 2px solid var(--border-color);
-        }
-
-        .tab {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-        }
-
-        .tab:hover {
-            color: var(--text-primary);
-        }
-
-        .tab.active {
-            background: var(--accent);
-            color: white;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid var(--input-border);
-            border-radius: 12px;
-            font-size: 16px;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        button.submit {
-            width: 100%;
-            padding: 16px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        button.submit:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        button.submit:active {
-            transform: translateY(0);
-        }
-
-        button.submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .resultado {
-            margin-top: 25px;
-            padding: 25px;
-            background: var(--input-bg);
-            border-radius: 16px;
-            border-left: 4px solid var(--accent);
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .resultado.show {
-            display: block;
-        }
-
-        .resultado h3 {
-            color: var(--text-primary);
-            margin-bottom: 10px;
-            font-size: 20px;
-        }
-
-        .fonte {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 10px;
-            font-style: italic;
-        }
-
-        .painel {
-            display: none;
-        }
-
-        .painel.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .lista-palavras {
-            margin-top: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .item-palavra {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-            border-radius: 8px;
-        }
-
-        .item-palavra:hover {
-            background: var(--input-bg);
-            transform: translateX(5px);
-        }
-
-        .item-palavra strong {
-            color: var(--text-primary);
-            font-size: 16px;
-        }
-
-        .badge {
-            background: var(--accent);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-right: 5px;
-            display: inline-block;
-            margin-top: 5px;
-        }
-
-        .btn-remover {
-            background: var(--error);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-remover:hover {
-            background: #e53e3e;
-            transform: scale(1.05);
-        }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Responsividade Mobile */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                padding: 25px;
-                border-radius: 16px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
-
-            .theme-toggle {
-                width: 40px;
-                height: 40px;
-                font-size: 20px;
-            }
-
-            .stats strong {
-                font-size: 24px;
-            }
-
-            .tabs {
-                flex-direction: column;
-            }
-
-            .tab {
-                padding: 10px;
-                font-size: 13px;
-            }
-
-            input, select, button.submit {
-                padding: 12px;
-                font-size: 14px;
-            }
-
-            .item-palavra {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .btn-remover {
-                width: 100%;
-            }
-        }
-
-        /* Scrollbar personalizada */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--input-bg);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-hover);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); min-height: 100vh; padding: 20px; color: var(--text-primary); transition: background 0.3s ease; display: flex; align-items: center; justify-content: center; }
+        .container { width: 100%; max-width: 900px; background: var(--bg-card); backdrop-filter: blur(10px); border-radius: 24px; padding: 40px; box-shadow: var(--shadow); animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Auth Styles */
+        .auth-container { max-width: 400px; margin: 0 auto; text-align: center; }
+        .auth-tabs { display: flex; margin-bottom: 20px; background: var(--input-bg); border-radius: 12px; padding: 5px; border: 2px solid var(--border-color); }
+        .auth-tab { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 600; color: var(--text-secondary); transition: 0.3s; }
+        .auth-tab.active { background: var(--accent); color: white; }
+        
+        /* App Styles */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        h1 { font-size: 28px; background: linear-gradient(135deg, var(--accent) 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-info { display: flex; align-items: center; gap: 15px; font-weight: 600; color: var(--text-secondary); }
+        .btn-logout { background: var(--error); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-logout:hover { background: #e53e3e; }
+        
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; background: var(--input-bg); padding: 6px; border-radius: 12px; border: 2px solid var(--border-color); }
+        .tab { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 600; color: var(--text-secondary); transition: 0.3s; }
+        .tab.active { background: var(--accent); color: white; }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 14px; }
+        input, select { width: 100%; padding: 14px; border: 2px solid var(--input-border); border-radius: 12px; font-size: 16px; background: var(--input-bg); color: var(--text-primary); transition: 0.3s; }
+        input:focus, select:focus { outline: none; border-color: var(--accent); }
+        button.submit { width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        button.submit:hover { background: var(--accent-hover); transform: translateY(-2px); }
+        
+        .resultado { margin-top: 25px; padding: 25px; background: var(--input-bg); border-radius: 16px; border-left: 4px solid var(--accent); display: none; }
+        .resultado.show { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .lista-palavras { max-height: 400px; overflow-y: auto; }
+        .item-palavra { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; border-radius: 8px; }
+        .item-palavra:hover { background: var(--input-bg); }
+        .badge { background: var(--accent); color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-right: 5px; }
+        .btn-remover { background: var(--error); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        
+        .painel { display: none; } .painel.active { display: block; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🌍 Dicionário Web</h1>
-            <button class="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
-                <span id="theme-icon">🌙</span>
-            </button>
-        </div>
-        
-        <p class="subtitle">Traduções inteligentes com banco de dados persistente</p>
-        
-        <div class="stats">
-            <strong id="total-palavras">{{ palavras|length }}</strong>
-            <span>palavras no seu dicionário</span>
-        </div>
-        
-        <div class="tabs">
-            <button class="tab active" onclick="mudarPainel('traduzir', this)">🔍 Traduzir</button>
-            <button class="tab" onclick="mudarPainel('adicionar', this)">➕ Adicionar</button>
-            <button class="tab" onclick="mudarPainel('listar', this)">📖 Listar</button>
+        <!-- TELA DE LOGIN / CADASTRO -->
+        <div id="auth-screen" class="{% if current_user.is_authenticated %}hidden{% endif %}">
+            <div class="auth-container">
+                <h1 style="margin-bottom: 10px;"> Dicionário Web</h1>
+                <p style="color: var(--text-muted); margin-bottom: 30px;">Faça login ou crie sua conta</p>
+                
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="toggleAuth('login')">Entrar</button>
+                    <button class="auth-tab" onclick="toggleAuth('register')">Cadastrar</button>
+                </div>
+
+                <div id="form-login">
+                    <div class="form-group"><label>Usuário</label><input type="text" id="login-user" placeholder="Seu nome de usuário"></div>
+                    <div class="form-group"><label>Senha</label><input type="password" id="login-pass" placeholder="Sua senha"></div>
+                    <button class="submit" onclick="fazerLogin()">Entrar</button>
+                    <div id="msg-login" style="margin-top: 15px; color: var(--error); font-size: 14px;"></div>
+                </div>
+
+                <div id="form-register" class="hidden">
+                    <div class="form-group"><label>Escolha um Usuário</label><input type="text" id="reg-user" placeholder="Ex: carlitos18"></div>
+                    <div class="form-group"><label>Crie uma Senha</label><input type="password" id="reg-pass" placeholder="Mínimo 4 caracteres"></div>
+                    <button class="submit" onclick="fazerCadastro()">Criar Conta</button>
+                    <div id="msg-reg" style="margin-top: 15px; color: var(--error); font-size: 14px;"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- PAINEL DE TRADUÇÃO -->
-        <div id="painel-traduzir" class="painel active">
-            <div class="form-group">
-                <label>Palavra em Português</label>
-                <input type="text" id="palavra-traduzir" placeholder="Digite uma palavra..." autocomplete="off">
+        <!-- TELA DO APLICATIVO -->
+        <div id="app-screen" class="{% if not current_user.is_authenticated %}hidden{% endif %}">
+            <div class="header">
+                <h1>🌍 Meu Dicionário</h1>
+                <div class="user-info">
+                    <span>👤 {{ current_user.username }}</span>
+                    <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Idioma Alvo</label>
-                <select id="idioma-traduzir">
-                    <option value="en">🇺🇸 Inglês (en)</option>
-                    <option value="es">🇪🇸 Espanhol (es)</option>
-                    <option value="fr">🇫🇷 Francês (fr)</option>
-                    <option value="de">🇩🇪 Alemão (de)</option>
-                    <option value="it">🇮🇹 Italiano (it)</option>
-                    <option value="pt">🇧🇷 Português (pt)</option>
-                </select>
-            </div>
-            <button class="submit" onclick="fazerTraducao()" id="btn-traduzir">
-                Traduzir
-            </button>
             
-            <div id="resultado-traducao" class="resultado">
-                <h3 id="texto-traducao"></h3>
-                <p class="fonte" id="fonte-traducao"></p>
+            <div class="tabs">
+                <button class="tab active" onclick="mudarPainel('traduzir', this)">🔍 Traduzir</button>
+                <button class="tab" onclick="mudarPainel('adicionar', this)">➕ Adicionar</button>
+                <button class="tab" onclick="mudarPainel('listar', this)"> Listar</button>
             </div>
-        </div>
 
-        <!-- PAINEL DE ADICIONAR -->
-        <div id="painel-adicionar" class="painel">
-            <div class="form-group">
-                <label>Palavra em Português</label>
-                <input type="text" id="palavra-adicionar" placeholder="Ex: Programação">
+            <div id="painel-traduzir" class="painel active">
+                <div class="form-group"><label>Palavra</label><input type="text" id="palavra-traduzir" placeholder="Digite..."></div>
+                <div class="form-group"><label>Idioma</label>
+                    <select id="idioma-traduzir">
+                        <option value="en">🇺🇸 Inglês</option><option value="es">🇪🇸 Espanhol</option>
+                        <option value="fr">🇫🇷 Francês</option><option value="de">🇩🇪 Alemão</option>
+                    </select>
+                </div>
+                <button class="submit" onclick="fazerTraducao()">Traduzir</button>
+                <div id="resultado-traducao" class="resultado"><h3 id="texto-traducao"></h3><p id="fonte-traducao" style="font-size: 12px; color: var(--text-muted); margin-top: 10px;"></p></div>
             </div>
-            <div class="form-group">
-                <label>Idioma</label>
-                <select id="idioma-adicionar">
-                    <option value="en">🇺🇸 Inglês (en)</option>
-                    <option value="es">🇪🇸 Espanhol (es)</option>
-                    <option value="fr">🇫🇷 Francês (fr)</option>
-                    <option value="de">🇩🇪 Alemão (de)</option>
-                    <option value="it">🇮🇹 Italiano (it)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Tradução</label>
-                <input type="text" id="traducao-adicionar" placeholder="Ex: Programming">
-            </div>
-            <button class="submit" onclick="fazerAdicao()" id="btn-adicionar">
-                Adicionar ao Dicionário
-            </button>
-            
-            <div id="resultado-adicao" class="resultado">
-                <h3 id="texto-adicao"></h3>
-            </div>
-        </div>
 
-        <!-- PAINEL DE LISTAR -->
-        <div id="painel-listar" class="painel">
-            <div class="form-group">
-                <input type="text" id="buscar-palavra" placeholder="🔍 Buscar palavra..." onkeyup="buscarPalavras()">
+            <div id="painel-adicionar" class="painel">
+                <div class="form-group"><label>Palavra</label><input type="text" id="palavra-add"></div>
+                <div class="form-group"><label>Idioma</label>
+                    <select id="idioma-add"><option value="en">Inglês</option><option value="es">Espanhol</option><option value="fr">Francês</option></select>
+                </div>
+                <div class="form-group"><label>Tradução</label><input type="text" id="trad-add"></div>
+                <button class="submit" onclick="fazerAdicao()">Salvar</button>
+                <div id="resultado-add" class="resultado"><h3 id="texto-add"></h3></div>
             </div>
-            <div id="lista-palavras" class="lista-palavras">
-                <p style="text-align: center; color: var(--text-muted);">Carregando...</p>
+
+            <div id="painel-listar" class="painel">
+                <div class="form-group"><input type="text" id="buscar" placeholder="🔍 Buscar..." onkeyup="buscarPalavras()"></div>
+                <div id="lista" class="lista-palavras"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Tema escuro/claro
-        function toggleTheme() {
-            const html = document.documentElement;
-            const icon = document.getElementById('theme-icon');
-            
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.removeAttribute('data-theme');
-                icon.textContent = '🌙';
-                localStorage.setItem('theme', 'light');
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                icon.textContent = '☀️';
-                localStorage.setItem('theme', 'dark');
-            }
+        // Lógica de Autenticação
+        function toggleAuth(type) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('form-login').classList.toggle('hidden', type !== 'login');
+            document.getElementById('form-register').classList.toggle('hidden', type !== 'register');
+            document.getElementById('msg-login').textContent = '';
+            document.getElementById('msg-reg').textContent = '';
         }
 
-        // Carregar tema salvo
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('theme-icon').textContent = '☀️';
+        async function fazerLogin() {
+            const username = document.getElementById('login-user').value;
+            const password = document.getElementById('login-pass').value;
+            const res = await fetch('/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username, password}) });
+            const data = await res.json();
+            if (data.sucesso) location.reload();
+            else document.getElementById('msg-login').textContent = data.erro;
         }
 
+        async function fazerCadastro() {
+            const username = document.getElementById('reg-user').value;
+            const password = document.getElementById('reg-pass').value;
+            const res = await fetch('/register', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username, password}) });
+            const data = await res.json();
+            if (data.sucesso) location.reload();
+            else document.getElementById('msg-reg').textContent = data.erro;
+        }
+
+        async function fazerLogout() {
+            await fetch('/logout');
+            location.reload();
+        }
+
+        // Lógica do App
         function mudarPainel(painel, btn) {
             document.querySelectorAll('.painel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById('painel-' + painel).classList.add('active');
             btn.classList.add('active');
-            
-            if (painel === 'listar') {
-                carregarLista();
-            }
-        }
-
-        function setLoading(btnId, loading) {
-            const btn = document.getElementById(btnId);
-            if (loading) {
-                btn.disabled = true;
-                btn.innerHTML = '<span class="loading"></span> Processando...';
-            } else {
-                btn.disabled = false;
-                btn.innerHTML = btnId === 'btn-traduzir' ? 'Traduzir' : 'Adicionar ao Dicionário';
-            }
+            if (painel === 'listar') carregarLista();
         }
 
         async function fazerTraducao() {
-            const palavra = document.getElementById('palavra-traduzir').value.trim();
+            const palavra = document.getElementById('palavra-traduzir').value;
             const idioma = document.getElementById('idioma-traduzir').value;
-            
-            if (!palavra) {
-                alert('Digite uma palavra!');
-                return;
-            }
-            
-            setLoading('btn-traduzir', true);
-            
-            try {
-                const resposta = await fetch('/traduzir', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({palavra, idioma})
-                });
-                
-                const dados = await resposta.json();
-                const resultado = document.getElementById('resultado-traducao');
-                
-                if (dados.erro) {
-                    document.getElementById('texto-traducao').textContent = '❌ ' + dados.erro;
-                    document.getElementById('fonte-traducao').textContent = '';
-                } else {
-                    document.getElementById('texto-traducao').textContent = 
-                        `"${palavra}" → "${dados.traducao}"`;
-                    document.getElementById('fonte-traducao').textContent = dados.fonte;
-                }
-                resultado.classList.add('show');
-            } catch (error) {
-                alert('Erro ao traduzir. Tente novamente.');
-            } finally {
-                setLoading('btn-traduzir', false);
-            }
+            const res = await fetch('/traduzir', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({palavra, idioma}) });
+            const data = await res.json();
+            document.getElementById('texto-traducao').textContent = data.erro ? '❌ ' + data.erro : `"${palavra}" → "${data.traducao}"`;
+            document.getElementById('fonte-traducao').textContent = data.fonte || '';
+            document.getElementById('resultado-traducao').classList.add('show');
         }
 
         async function fazerAdicao() {
-            const palavra = document.getElementById('palavra-adicionar').value.trim();
-            const idioma = document.getElementById('idioma-adicionar').value;
-            const traducao = document.getElementById('traducao-adicionar').value.trim();
-            
-            if (!palavra || !idioma || !traducao) {
-                alert('Preencha todos os campos!');
-                return;
-            }
-            
-            setLoading('btn-adicionar', true);
-            
-            try {
-                const resposta = await fetch('/adicionar', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({palavra, idioma, traducao})
-                });
-                
-                const dados = await resposta.json();
-                const resultado = document.getElementById('resultado-adicao');
-                
-                if (dados.erro) {
-                    document.getElementById('texto-adicao').textContent = '❌ ' + dados.erro;
-                } else {
-                    document.getElementById('texto-adicao').textContent = '✅ ' + dados.sucesso;
-                    atualizarStats();
-                    // Limpar campos
-                    document.getElementById('palavra-adicionar').value = '';
-                    document.getElementById('traducao-adicionar').value = '';
-                }
-                resultado.classList.add('show');
-            } catch (error) {
-                alert('Erro ao adicionar. Tente novamente.');
-            } finally {
-                setLoading('btn-adicionar', false);
-            }
+            const palavra = document.getElementById('palavra-add').value;
+            const idioma = document.getElementById('idioma-add').value;
+            const traducao = document.getElementById('trad-add').value;
+            const res = await fetch('/adicionar', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({palavra, idioma, traducao}) });
+            const data = await res.json();
+            document.getElementById('texto-add').textContent = data.erro ? '❌ ' + data.erro : '✅ ' + data.sucesso;
+            document.getElementById('resultado-add').classList.add('show');
         }
 
         async function carregarLista() {
-            const container = document.getElementById('lista-palavras');
-            container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Carregando...</p>';
-            
-            try {
-                const resposta = await fetch('/listar');
-                const dados = await resposta.json();
-                
-                if (dados.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhuma palavra cadastrada</p>';
-                    return;
-                }
-                
-                let html = '';
-                dados.forEach(item => {
-                    const idiomas = Object.keys(item.traducoes).map(i => 
-                        `<span class="badge">${i}</span>`
-                    ).join('');
-                    
-                    html += `
-                        <div class="item-palavra">
-                            <div>
-                                <strong>${item.palavra}</strong><br>
-                                <small>${idiomas}</small>
-                            </div>
-                            <button class="btn-remover" onclick="removerPalavra('${item.palavra}')">🗑️ Remover</button>
-                        </div>
-                    `;
-                });
-                
-                container.innerHTML = html;
-            } catch (error) {
-                container.innerHTML = '<p style="text-align: center; color: var(--error);">Erro ao carregar lista</p>';
-            }
+            const res = await fetch('/listar');
+            const dados = await res.json();
+            const container = document.getElementById('lista');
+            if (!dados.length) { container.innerHTML = '<p style="text-align:center; color:var(--text-muted)">Vazio</p>'; return; }
+            container.innerHTML = dados.map(item => `
+                <div class="item-palavra">
+                    <div><strong>${item.palavra}</strong><br><small>${Object.keys(item.traducoes).map(i => `<span class="badge">${i}</span>`).join('')}</small></div>
+                    <button class="btn-remover" onclick="remover('${item.palavra}')">🗑️</button>
+                </div>`).join('');
         }
 
-        async function removerPalavra(palavra) {
-            if (!confirm(`Remover "${palavra}" do dicionário?`)) return;
-            
-            try {
-                await fetch('/remover', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({palavra, idioma: ''})
-                });
-                
-                carregarLista();
-                atualizarStats();
-            } catch (error) {
-                alert('Erro ao remover. Tente novamente.');
-            }
+        async function remover(palavra) {
+            if(!confirm('Remover?')) return;
+            await fetch('/remover', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({palavra}) });
+            carregarLista();
         }
 
         async function buscarPalavras() {
-            const query = document.getElementById('buscar-palavra').value.trim();
-            if (query.length < 2) {
-                carregarLista();
-                return;
-            }
-            
-            try {
-                const resposta = await fetch(`/api/palavras?q=${query}`);
-                const dados = await resposta.json();
-                
-                const container = document.getElementById('lista-palavras');
-                if (dados.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhuma palavra encontrada</p>';
-                    return;
-                }
-                
-                container.innerHTML = dados.map(p => `
-                    <div class="item-palavra">
-                        <strong>${p}</strong>
-                        <button class="btn-remover" onclick="removerPalavra('${p}')">🗑️ Remover</button>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Erro na busca:', error);
-            }
+            const q = document.getElementById('buscar').value;
+            if (q.length < 2) { carregarLista(); return; }
+            const res = await fetch(`/api/palavras?q=${q}`);
+            const dados = await res.json();
+            document.getElementById('lista').innerHTML = dados.map(p => `
+                <div class="item-palavra"><strong>${p}</strong><button class="btn-remover" onclick="remover('${p}')">🗑️</button></div>`).join('');
         }
-
-        async function atualizarStats() {
-            try {
-                const resposta = await fetch('/listar');
-                const dados = await resposta.json();
-                document.getElementById('total-palavras').textContent = dados.length;
-            } catch (error) {
-                console.error('Erro ao atualizar stats:', error);
-            }
-        }
-
-        // Enter para traduzir
-        document.getElementById('palavra-traduzir').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                fazerTraducao();
-            }
-        });
     </script>
 </body>
 </html>

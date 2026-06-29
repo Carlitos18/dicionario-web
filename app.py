@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 from deep_translator import GoogleTranslator
 import os
 from datetime import datetime
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'sua_chave_secreta_super_segura_aqui' # Mude isso em produção!
 
 # Configuração do banco de dados
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -12,242 +15,218 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'di
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login' # Redireciona para /login se tentar acessar área restrita
 
 # ==========================================
 # MODELOS DO BANCO DE DADOS
 # ==========================================
 
-class Palavra(db.Model):
-    """Tabela de palavras em português"""
+class User(UserMixin, db.Model):
+    """Tabela de Usuários"""
     id = db.Column(db.Integer, primary_key=True)
-    palavra = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    username = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(200), nullable=False)
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
-    traducoes = db.relationship('Traducao', backref='palavra', lazy=True, cascade='all, delete-orphan')
+    
+    # Relação: um usuário tem muitas palavras
+    palavras = db.relationship('Palavra', backref='dono', lazy=True, cascade='all, delete-orphan')
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+        
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+class Palavra(db.Model):
+    """Tabela de palavras"""
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # DONO DA PALAVRA
+    palavra = db.Column(db.String(100), nullable=False, index=True)
+    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+    traducoes = db.relationship('Traducao', backref='palavra_obj', lazy=True, cascade='all, delete-orphan')
     
     def to_dict(self):
         return {
             'id': self.id,
             'palavra': self.palavra,
-            'traducoes': {t.idioma: t.traducao for t in self.traducoes},
-            'data_criacao': self.data_criacao.isoformat()
+            'traducoes': {t.idioma: t.traducao for t in self.traducoes}
         }
 
 class Traducao(db.Model):
     """Tabela de traduções"""
     id = db.Column(db.Integer, primary_key=True)
     palavra_id = db.Column(db.Integer, db.ForeignKey('palavra.id'), nullable=False)
-    idioma = db.Column(db.String(10), nullable=False)  # en, es, fr, etc
+    idioma = db.Column(db.String(10), nullable=False)
     traducao = db.Column(db.String(200), nullable=False)
-    
-    # Garante que não haja duplicatas (mesma palavra + mesmo idioma)
     __table_args__ = (db.UniqueConstraint('palavra_id', 'idioma', name='_palavra_idioma_uc'),)
 
 # ==========================================
-# FUNÇÕES AUXILIARES
+# FLASK-LOGIN SETUP
+# ==========================================
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# ==========================================
+# FUNÇÕES DE TRADUÇÃO
 # ==========================================
 
 def traduzir_com_fallback(palavra_texto, idioma_alvo):
-    """
-    Tenta buscar no banco. Se não achar, consulta a API do Google.
-    """
-    # 1. Busca no banco de dados
-    palavra_obj = Palavra.query.filter_by(palavra=palavra_texto).first()
+    # Busca APENAS nas palavras do usuário atual
+    palavra_obj = Palavra.query.filter_by(palavra=palavra_texto, user_id=current_user.id).first()
     
     if palavra_obj:
         for trad in palavra_obj.traducoes:
             if trad.idioma == idioma_alvo:
-                return {
-                    "traducao": trad.traducao,
-                    "fonte": "📚 Banco de Dados"
-                }
+                return {"traducao": trad.traducao, "fonte": "📚 Seu Dicionário"}
     
-    # 2. Se não achou, consulta a API do Google
     try:
         resultado = GoogleTranslator(source='pt', target=idioma_alvo).translate(palavra_texto)
-        
-        if resultado is None:
+        if not resultado:
             return {"traducao": None, "fonte": "❌ Não foi possível traduzir"}
         
-        # Salva automaticamente no banco!
         if not palavra_obj:
-            palavra_obj = Palavra(palavra=palavra_texto)
+            palavra_obj = Palavra(palavra=palavra_texto, user_id=current_user.id)
             db.session.add(palavra_obj)
-            db.session.flush()  # Para pegar o ID
+            db.session.flush()
         
-        # Verifica se já existe tradução para este idioma
-        trad_existente = Traducao.query.filter_by(
-            palavra_id=palavra_obj.id, 
-            idioma=idioma_alvo
-        ).first()
-        
+        trad_existente = Traducao.query.filter_by(palavra_id=palavra_obj.id, idioma=idioma_alvo).first()
         if trad_existente:
             trad_existente.traducao = resultado
         else:
-            nova_traducao = Traducao(
-                palavra_id=palavra_obj.id,
-                idioma=idioma_alvo,
-                traducao=resultado
-            )
-            db.session.add(nova_traducao)
+            db.session.add(Traducao(palavra_id=palavra_obj.id, idioma=idioma_alvo, traducao=resultado))
         
         db.session.commit()
-        
-        return {
-            "traducao": resultado,
-            "fonte": "🌐 Google Translate (salvo no banco!)"
-        }
+        return {"traducao": resultado, "fonte": "🌐 Google Translate (salvo!)"}
     except Exception as e:
         db.session.rollback()
         return {"traducao": None, "fonte": f"❌ Erro na API: {str(e)}"}
 
 # ==========================================
-# ROTAS DO SITE
+# ROTAS DE AUTENTICAÇÃO
+# ==========================================
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        dados = request.get_json()
+        username = dados.get('username', '').strip()
+        password = dados.get('password', '').strip()
+        
+        user = User.query.filter_by(username=username).first()
+        if user and user.check_password(password):
+            login_user(user)
+            return jsonify({"sucesso": True, "redirect": "/"})
+        return jsonify({"erro": "Usuário ou senha incorretos"}), 401
+    return render_template('index.html')
+
+@app.route('/register', methods=['POST'])
+def register():
+    dados = request.get_json()
+    username = dados.get('username', '').strip()
+    password = dados.get('password', '').strip()
+    
+    if not username or not password:
+        return jsonify({"erro": "Preencha todos os campos"}), 400
+        
+    if User.query.filter_by(username=username).first():
+        return jsonify({"erro": "Este nome de usuário já existe"}), 400
+        
+    novo_user = User(username=username)
+    novo_user.set_password(password)
+    db.session.add(novo_user)
+    db.session.commit()
+    
+    login_user(novo_user)
+    return jsonify({"sucesso": True, "redirect": "/"})
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return jsonify({"sucesso": True})
+
+# ==========================================
+# ROTAS DO APLICATIVO (PROTEGIDAS)
 # ==========================================
 
 @app.route('/')
+@login_required
 def index():
-    """Página principal"""
-    palavras = Palavra.query.order_by(Palavra.palavra).all()
+    palavras = Palavra.query.filter_by(user_id=current_user.id).order_by(Palavra.palavra).all()
     return render_template('index.html', palavras=[p.palavra for p in palavras])
 
 @app.route('/traduzir', methods=['POST'])
+@login_required
 def traduzir():
-    """Recebe a palavra e idioma do formulário"""
     dados = request.get_json()
-    palavra = dados.get('palavra', '').strip()
-    idioma = dados.get('idioma', '').strip()
-    
-    if not palavra or not idioma:
-        return jsonify({"erro": "Preencha todos os campos!"})
-    
-    resultado = traduzir_com_fallback(palavra, idioma)
-    return jsonify(resultado)
+    return jsonify(traduzir_com_fallback(dados.get('palavra', '').strip(), dados.get('idioma', '').strip()))
 
 @app.route('/adicionar', methods=['POST'])
+@login_required
 def adicionar():
-    """Adiciona uma tradução manualmente"""
     dados = request.get_json()
     palavra_texto = dados.get('palavra', '').strip()
     idioma = dados.get('idioma', '').strip()
     traducao_texto = dados.get('traducao', '').strip()
     
     if not all([palavra_texto, idioma, traducao_texto]):
-        return jsonify({"erro": "Preencha todos os campos!"})
+        return jsonify({"erro": "Preencha todos os campos"}), 400
     
-    try:
-        # Busca ou cria a palavra
-        palavra_obj = Palavra.query.filter_by(palavra=palavra_texto).first()
-        if not palavra_obj:
-            palavra_obj = Palavra(palavra=palavra_texto)
-            db.session.add(palavra_obj)
-            db.session.flush()
-        
-        # Verifica se já existe tradução
-        trad_existente = Traducao.query.filter_by(
-            palavra_id=palavra_obj.id, 
-            idioma=idioma
-        ).first()
-        
-        if trad_existente:
-            trad_existente.traducao = traducao_texto
-        else:
-            nova_traducao = Traducao(
-                palavra_id=palavra_obj.id,
-                idioma=idioma,
-                traducao=traducao_texto
-            )
-            db.session.add(nova_traducao)
-        
-        db.session.commit()
-        
-        return jsonify({"sucesso": f"'{palavra_texto}' em {idioma} = '{traducao_texto}'"})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"erro": f"Erro ao salvar: {str(e)}"}), 500
+    palavra_obj = Palavra.query.filter_by(palavra=palavra_texto, user_id=current_user.id).first()
+    if not palavra_obj:
+        palavra_obj = Palavra(palavra=palavra_texto, user_id=current_user.id)
+        db.session.add(palavra_obj)
+        db.session.flush()
+    
+    trad_existente = Traducao.query.filter_by(palavra_id=palavra_obj.id, idioma=idioma).first()
+    if trad_existente:
+        trad_existente.traducao = traducao_texto
+    else:
+        db.session.add(Traducao(palavra_id=palavra_obj.id, idioma=idioma, traducao=traducao_texto))
+    
+    db.session.commit()
+    return jsonify({"sucesso": f"'{palavra_texto}' adicionado!"})
 
 @app.route('/remover', methods=['POST'])
+@login_required
 def remover():
-    """Remove uma palavra ou tradução específica"""
     dados = request.get_json()
     palavra_texto = dados.get('palavra', '').strip()
-    idioma = dados.get('idioma', '').strip()
     
-    try:
-        palavra_obj = Palavra.query.filter_by(palavra=palavra_texto).first()
-        if not palavra_obj:
-            return jsonify({"erro": "Palavra não encontrada"}), 404
-        
-        if not idioma:
-            # Remove a palavra inteira
-            db.session.delete(palavra_obj)
-            db.session.commit()
-            return jsonify({"sucesso": f"Palavra '{palavra_texto}' removida!"})
-        else:
-            # Remove apenas uma tradução
-            trad = Traducao.query.filter_by(
-                palavra_id=palavra_obj.id, 
-                idioma=idioma
-            ).first()
-            if trad:
-                db.session.delete(trad)
-                db.session.commit()
-                return jsonify({"sucesso": f"Tradução em {idioma} removida!"})
-            else:
-                return jsonify({"erro": "Tradução não encontrada"}), 404
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"erro": f"Erro ao remover: {str(e)}"}), 500
+    palavra_obj = Palavra.query.filter_by(palavra=palavra_texto, user_id=current_user.id).first()
+    if palavra_obj:
+        db.session.delete(palavra_obj)
+        db.session.commit()
+        return jsonify({"sucesso": "Removido!"})
+    return jsonify({"erro": "Não encontrado"}), 404
 
 @app.route('/listar')
+@login_required
 def listar():
-    """Retorna todas as palavras do banco"""
-    palavras = Palavra.query.order_by(Palavra.palavra).all()
+    palavras = Palavra.query.filter_by(user_id=current_user.id).order_by(Palavra.palavra).all()
     return jsonify([p.to_dict() for p in palavras])
 
 @app.route('/api/palavras')
+@login_required
 def api_palavras():
-    """API para buscar palavras (autocomplete)"""
     query = request.args.get('q', '').strip()
-    if len(query) < 2:
-        return jsonify([])
-    
-    palavras = Palavra.query.filter(
-        Palavra.palavra.ilike(f'%{query}%')
-    ).limit(10).all()
-    
+    if len(query) < 2: return jsonify([])
+    palavras = Palavra.query.filter(Palavra.user_id == current_user.id, Palavra.palavra.ilike(f'%{query}%')).limit(10).all()
     return jsonify([p.palavra for p in palavras])
 
 # ==========================================
-# INICIALIZAÇÃO DO BANCO (EXECUTA SEMPRE)
+# INICIALIZAÇÃO
 # ==========================================
 
 def inicializar_banco():
-    """Cria as tabelas e adiciona dados iniciais se vazio"""
     with app.app_context():
         db.create_all()
-        
-        # Se não houver palavras, adiciona algumas iniciais
-        if Palavra.query.count() == 0:
-            iniciais = [
-                ("Olá", {"en": "Hello", "es": "Hola", "fr": "Bonjour"}),
-                ("Obrigado", {"en": "Thank you", "es": "Gracias", "fr": "Merci"}),
-                ("Bom dia", {"en": "Good morning", "es": "Buenos días", "fr": "Bonjour"}),
-            ]
-            
-            for palavra_pt, traducoes in iniciais:
-                p = Palavra(palavra=palavra_pt)
-                db.session.add(p)
-                db.session.flush()
-                
-                for idioma, trad in traducoes.items():
-                    t = Traducao(palavra_id=p.id, idioma=idioma, traducao=trad)
-                    db.session.add(t)
-            
-            db.session.commit()
-            print("✅ Banco de dados inicializado com dados padrão!")
+        print("✅ Banco de dados pronto!")
 
-# ⚠️ IMPORTANTE: Chama a inicialização FORA do if __name__ == '__main__'
-# Isso garante que funcione tanto localmente quanto no gunicorn (Render)
 inicializar_banco()
 
 if __name__ == '__main__':
