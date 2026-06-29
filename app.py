@@ -218,7 +218,7 @@ def api_palavras():
     return jsonify([p.palavra for p in palavras])
 
 # ==========================================
-# INICIALIZAÇÃO DO BANCO
+# INICIALIZAÇÃO DO BANCO (EXECUTA SEMPRE)
 # ==========================================
 
 def inicializar_banco():
@@ -246,6 +246,9 @@ def inicializar_banco():
             db.session.commit()
             print("✅ Banco de dados inicializado com dados padrão!")
 
+# ⚠️ IMPORTANTE: Chama a inicialização FORA do if __name__ == '__main__'
+# Isso garante que funcione tanto localmente quanto no gunicorn (Render)
+inicializar_banco()
+
 if __name__ == '__main__':
-    inicializar_banco()
     app.run(debug=True, port=5000)
