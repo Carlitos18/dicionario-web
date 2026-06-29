@@ -3,26 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌍 Dicionário Web</title>
+    <title>🌍 Dicionário Web - Com Banco de Dados</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         .container {
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
             border-radius: 20px;
             padding: 40px;
-            max-width: 600px;
-            width: 100%;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        h1 { text-align: center; color: #333; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 14px; }
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab {
             flex: 1; padding: 12px; border: none; background: #f0f0f0;
@@ -53,31 +51,77 @@
         .fonte { font-size: 12px; color: #888; margin-top: 8px; font-style: italic; }
         .painel { display: none; }
         .painel.active { display: block; }
+        .lista-palavras {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .item-palavra {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-palavra:hover { background: #f8f9fa; }
+        .badge {
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        .btn-remover {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-remover:hover { background: #c0392b; }
+        .stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .stats strong { color: #667eea; font-size: 24px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🌍 Dicionário Web</h1>
+        <p class="subtitle">Com banco de dados persistente</p>
+        
+        <div class="stats">
+            <strong id="total-palavras">{{ palavras|length }}</strong> palavras cadastradas
+        </div>
         
         <div class="tabs">
             <button class="tab active" onclick="mudarPainel('traduzir')">🔍 Traduzir</button>
             <button class="tab" onclick="mudarPainel('adicionar')">➕ Adicionar</button>
+            <button class="tab" onclick="mudarPainel('listar')">📖 Listar</button>
         </div>
 
         <!-- PAINEL DE TRADUÇÃO -->
         <div id="painel-traduzir" class="painel active">
             <div class="form-group">
                 <label>Palavra em Português</label>
-                <input type="text" id="palavra-traduzir" placeholder="Ex: Computador">
+                <input type="text" id="palavra-traduzir" placeholder="Ex: Computador" autocomplete="off">
             </div>
             <div class="form-group">
                 <label>Idioma Alvo</label>
                 <select id="idioma-traduzir">
                     <option value="en">🇺🇸 Inglês (en)</option>
                     <option value="es">🇪🇸 Espanhol (es)</option>
-                    <option value="fr">🇫🇷 Francês (fr)</option>
-                    <option value="de">🇩🇪 Alemão (de)</option>
-                    <option value="it">🇮🇹 Italiano (it)</option>
+                    <option value="fr">🇫 Francês (fr)</option>
+                    <option value="de">🇩 Alemão (de)</option>
+                    <option value="it">🇮 Italiano (it)</option>
+                    <option value="pt">🇧🇷 Português (pt)</option>
                 </select>
             </div>
             <button class="submit" onclick="fazerTraducao()">Traduzir</button>
@@ -100,6 +144,8 @@
                     <option value="en">🇺🇸 Inglês (en)</option>
                     <option value="es">🇪🇸 Espanhol (es)</option>
                     <option value="fr">🇫🇷 Francês (fr)</option>
+                    <option value="de">🇩 Alemão (de)</option>
+                    <option value="it">🇮🇹 Italiano (it)</option>
                 </select>
             </div>
             <div class="form-group">
@@ -112,6 +158,16 @@
                 <h3 id="texto-adicao"></h3>
             </div>
         </div>
+
+        <!-- PAINEL DE LISTAR -->
+        <div id="painel-listar" class="painel">
+            <div class="form-group">
+                <input type="text" id="buscar-palavra" placeholder="🔍 Buscar palavra..." onkeyup="buscarPalavras()">
+            </div>
+            <div id="lista-palavras" class="lista-palavras">
+                <p style="text-align: center; color: #888;">Carregando...</p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -120,6 +176,10 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById('painel-' + painel).classList.add('active');
             event.target.classList.add('active');
+            
+            if (painel === 'listar') {
+                carregarLista();
+            }
         }
 
         async function fazerTraducao() {
@@ -164,8 +224,82 @@
                 document.getElementById('texto-adicao').textContent = '❌ ' + dados.erro;
             } else {
                 document.getElementById('texto-adicao').textContent = '✅ ' + dados.sucesso;
+                atualizarStats();
             }
             resultado.classList.add('show');
+        }
+
+        async function carregarLista() {
+            const resposta = await fetch('/listar');
+            const dados = await resposta.json();
+            const container = document.getElementById('lista-palavras');
+            
+            if (dados.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888;">Nenhuma palavra cadastrada</p>';
+                return;
+            }
+            
+            let html = '';
+            dados.forEach(item => {
+                const idiomas = Object.keys(item.traducoes).map(i => 
+                    `<span class="badge">${i}</span>`
+                ).join('');
+                
+                html += `
+                    <div class="item-palavra">
+                        <div>
+                            <strong>${item.palavra}</strong><br>
+                            <small>${idiomas}</small>
+                        </div>
+                        <button class="btn-remover" onclick="removerPalavra('${item.palavra}')">🗑️</button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        async function removerPalavra(palavra) {
+            if (!confirm(`Remover "${palavra}" do dicionário?`)) return;
+            
+            await fetch('/remover', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({palavra, idioma: ''})
+            });
+            
+            carregarLista();
+            atualizarStats();
+        }
+
+        async function buscarPalavras() {
+            const query = document.getElementById('buscar-palavra').value;
+            if (query.length < 2) {
+                carregarLista();
+                return;
+            }
+            
+            const resposta = await fetch(`/api/palavras?q=${query}`);
+            const dados = await resposta.json();
+            
+            const container = document.getElementById('lista-palavras');
+            if (dados.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888;">Nenhuma palavra encontrada</p>';
+                return;
+            }
+            
+            container.innerHTML = dados.map(p => `
+                <div class="item-palavra">
+                    <strong>${p}</strong>
+                    <button class="btn-remover" onclick="removerPalavra('${p}')">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        async function atualizarStats() {
+            const resposta = await fetch('/listar');
+            const dados = await resposta.json();
+            document.getElementById('total-palavras').textContent = dados.length;
         }
     </script>
 </body>
