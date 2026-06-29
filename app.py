@@ -3,11 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from deep_translator import GoogleTranslator
+import requests
 import os
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '2969d9b90e756e1aa410b98f9d611a697921eea758f73ace542cc1d5d4a0dbec'  # Mude isso em produção!
+app.config['SECRET_KEY'] = 'sua_chave_secreta_super_segura_aqui'  # Mude isso em produção!
 
 # Configuração do banco de dados
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -43,6 +44,7 @@ class Palavra(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     palavra = db.Column(db.String(100), nullable=False, index=True)
+    nota_gramatical = db.Column(db.Text, nullable=True)  # NOVO: Campo para notas gramaticais
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     traducoes = db.relationship('Traducao', backref='palavra_obj', lazy=True, cascade='all, delete-orphan')
     
@@ -50,6 +52,7 @@ class Palavra(db.Model):
         return {
             'id': self.id,
             'palavra': self.palavra,
+            'nota_gramatical': self.nota_gramatical,
             'traducoes': {t.idioma: t.traducao for t in self.traducoes}
         }
 
@@ -70,7 +73,60 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # ==========================================
-# FUNÇÃO DE TRADUÇÃO (ABERTA PARA TODOS)
+# API DE CORREÇÃO GRAMATICAL (LanguageTool)
+# ==========================================
+
+def corrigir_gramatica(texto, idioma='pt-BR'):
+    """
+    Usa a API gratuita do LanguageTool para corrigir gramática.
+    Retorna o texto corrigido e as sugestões de correção.
+    """
+    try:
+        url = "https://api.languagetool.org/v2/check"
+        dados = {
+            'text': texto,
+            'language': idioma,
+            'enabledOnly': 'false'
+        }
+        
+        resposta = requests.post(url, data=dados, timeout=5)
+        resultado = resposta.json()
+        
+        # Aplica as correções (do final para o início para não bagunçar os índices)
+        texto_corrigido = texto
+        matches = resultado.get('matches', [])
+        matches.sort(key=lambda x: x['offset'], reverse=True)
+        
+        for match in matches:
+            offset = match['offset']
+            length = match['length']
+            replacements = match.get('replacements', [])
+            
+            if replacements:
+                # Usa a primeira sugestão
+                texto_corrigido = texto_corrigido[:offset] + replacements[0]['value'] + texto_corrigido[offset + length:]
+        
+        return {
+            'texto_corrigido': texto_corrigido,
+            'erros_encontrados': len(matches),
+            'sugestoes': [
+                {
+                    'mensagem': m.get('message', ''),
+                    'contexto': m.get('context', {}).get('text', ''),
+                    'replacements': [r['value'] for r in m.get('replacements', [])[:3]]
+                }
+                for m in matches[:5]  # Limita a 5 sugestões
+            ]
+        }
+    except Exception as e:
+        return {
+            'texto_corrigido': texto,
+            'erros_encontrados': 0,
+            'erro': f'Erro na API: {str(e)}'
+        }
+
+# ==========================================
+# FUNÇÃO DE TRADUÇÃO
 # ==========================================
 
 def traduzir_com_fallback(palavra_texto, idioma_alvo):
@@ -78,22 +134,19 @@ def traduzir_com_fallback(palavra_texto, idioma_alvo):
     Traduz a palavra. Se o usuário estiver logado, salva no banco.
     Se não estiver, apenas retorna a tradução da API.
     """
-    # 1. Se estiver logado, tenta buscar no banco pessoal
     if current_user.is_authenticated:
         palavra_obj = Palavra.query.filter_by(palavra=palavra_texto, user_id=current_user.id).first()
         
         if palavra_obj:
             for trad in palavra_obj.traducoes:
                 if trad.idioma == idioma_alvo:
-                    return {"traducao": trad.traducao, "fonte": "📚 Seu Dicionário"}
+                    return {"traducao": trad.traducao, "fonte": " Seu Dicionário"}
     
-    # 2. Consulta a API do Google Translate
     try:
         resultado = GoogleTranslator(source='pt', target=idioma_alvo).translate(palavra_texto)
         if not resultado:
             return {"traducao": None, "fonte": "❌ Não foi possível traduzir"}
         
-        # 3. Se estiver logado, salva no banco automaticamente
         if current_user.is_authenticated:
             if not palavra_obj:
                 palavra_obj = Palavra(palavra=palavra_texto, user_id=current_user.id)
@@ -109,7 +162,6 @@ def traduzir_com_fallback(palavra_texto, idioma_alvo):
             db.session.commit()
             return {"traducao": resultado, "fonte": "🌐 Google Translate (salvo no seu dicionário!)"}
         else:
-            # Se NÃO estiver logado, apenas retorna sem salvar
             return {"traducao": resultado, "fonte": "🌐 Google Translate (faça login para salvar!)"}
             
     except Exception as e:
@@ -165,7 +217,6 @@ def logout():
 
 @app.route('/')
 def index():
-    """Página principal - visível para todos"""
     if current_user.is_authenticated:
         palavras = Palavra.query.filter_by(user_id=current_user.id).order_by(Palavra.palavra).all()
         return render_template('index.html', palavras=[p.palavra for p in palavras])
@@ -173,7 +224,6 @@ def index():
 
 @app.route('/traduzir', methods=['POST'])
 def traduzir():
-    """Qualquer pessoa pode traduzir, mas só logados salvam."""
     dados = request.get_json()
     palavra = dados.get('palavra', '').strip()
     idioma = dados.get('idioma', '').strip()
@@ -186,20 +236,23 @@ def traduzir():
 @app.route('/adicionar', methods=['POST'])
 @login_required
 def adicionar():
-    """Apenas usuários logados podem adicionar manualmente."""
     dados = request.get_json()
     palavra_texto = dados.get('palavra', '').strip()
     idioma = dados.get('idioma', '').strip()
     traducao_texto = dados.get('traducao', '').strip()
+    nota_gramatical = dados.get('nota', '').strip()  # NOVO: Nota gramatical
     
     if not all([palavra_texto, idioma, traducao_texto]):
         return jsonify({"erro": "Preencha todos os campos"}), 400
     
     palavra_obj = Palavra.query.filter_by(palavra=palavra_texto, user_id=current_user.id).first()
     if not palavra_obj:
-        palavra_obj = Palavra(palavra=palavra_texto, user_id=current_user.id)
+        palavra_obj = Palavra(palavra=palavra_texto, user_id=current_user.id, nota_gramatical=nota_gramatical)
         db.session.add(palavra_obj)
         db.session.flush()
+    else:
+        if nota_gramatical:
+            palavra_obj.nota_gramatical = nota_gramatical
     
     trad_existente = Traducao.query.filter_by(palavra_id=palavra_obj.id, idioma=idioma).first()
     if trad_existente:
@@ -210,10 +263,22 @@ def adicionar():
     db.session.commit()
     return jsonify({"sucesso": f"'{palavra_texto}' adicionado!"})
 
+@app.route('/corrigir', methods=['POST'])
+def corrigir():
+    """Rota para correção gramatical (disponível para todos)"""
+    dados = request.get_json()
+    texto = dados.get('texto', '').strip()
+    idioma = dados.get('idioma', 'pt-BR')
+    
+    if not texto:
+        return jsonify({"erro": "Digite um texto para corrigir"}), 400
+    
+    resultado = corrigir_gramatica(texto, idioma)
+    return jsonify(resultado)
+
 @app.route('/remover', methods=['POST'])
 @login_required
 def remover():
-    """Apenas usuários logados podem remover."""
     dados = request.get_json()
     palavra_texto = dados.get('palavra', '').strip()
     
@@ -227,14 +292,12 @@ def remover():
 @app.route('/listar')
 @login_required
 def listar():
-    """Apenas usuários logados podem listar."""
     palavras = Palavra.query.filter_by(user_id=current_user.id).order_by(Palavra.palavra).all()
     return jsonify([p.to_dict() for p in palavras])
 
 @app.route('/api/palavras')
 @login_required
 def api_palavras():
-    """Apenas usuários logados podem buscar."""
     query = request.args.get('q', '').strip()
     if len(query) < 2:
         return jsonify([])

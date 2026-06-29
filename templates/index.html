@@ -11,7 +11,7 @@
             --bg-card: rgba(255, 255, 255, 0.95);
             --text-primary: #1a202c; --text-secondary: #4a5568; --text-muted: #718096;
             --border-color: #e2e8f0; --input-bg: #ffffff; --input-border: #cbd5e0;
-            --accent: #667eea; --accent-hover: #5568d3; --success: #48bb78; --error: #f56565;
+            --accent: #667eea; --accent-hover: #5568d3; --success: #48bb78; --error: #f56565; --warning: #ed8936;
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         [data-theme="dark"] {
@@ -23,10 +23,9 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--bg-primary); min-height: 100vh; padding: 20px; color: var(--text-primary); transition: background 0.3s ease; display: flex; align-items: center; justify-content: center; }
-        .container { width: 100%; max-width: 900px; background: var(--bg-card); backdrop-filter: blur(10px); border-radius: 24px; padding: 40px; box-shadow: var(--shadow); animation: slideUp 0.5s ease; }
+        .container { width: 100%; max-width: 1000px; background: var(--bg-card); backdrop-filter: blur(10px); border-radius: 24px; padding: 40px; box-shadow: var(--shadow); animation: slideUp 0.5s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Header */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         h1 { font-size: 28px; background: linear-gradient(135deg, var(--accent) 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .user-info { display: flex; align-items: center; gap: 15px; font-weight: 600; color: var(--text-secondary); }
@@ -35,55 +34,35 @@
         .btn-logout:hover { background: #e53e3e; }
         .btn-login:hover { background: var(--accent-hover); }
         
-        /* Tabs */
-        .tabs { display: flex; gap: 10px; margin-bottom: 30px; background: var(--input-bg); padding: 6px; border-radius: 12px; border: 2px solid var(--border-color); }
-        .tab { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 600; color: var(--text-secondary); transition: 0.3s; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; background: var(--input-bg); padding: 6px; border-radius: 12px; border: 2px solid var(--border-color); flex-wrap: wrap; }
+        .tab { flex: 1; min-width: 120px; padding: 12px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 600; color: var(--text-secondary); transition: 0.3s; }
         .tab.active { background: var(--accent); color: white; }
         
-        /* Forms */
         .form-group { margin-bottom: 20px; text-align: left; }
         label { display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600; font-size: 14px; }
-        input, select { width: 100%; padding: 14px; border: 2px solid var(--input-border); border-radius: 12px; font-size: 16px; background: var(--input-bg); color: var(--text-primary); transition: 0.3s; }
-        input:focus, select:focus { outline: none; border-color: var(--accent); }
+        input, select, textarea { width: 100%; padding: 14px; border: 2px solid var(--input-border); border-radius: 12px; font-size: 16px; background: var(--input-bg); color: var(--text-primary); transition: 0.3s; font-family: inherit; }
+        textarea { resize: vertical; min-height: 100px; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
         button.submit { width: 100%; padding: 16px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
         button.submit:hover { background: var(--accent-hover); transform: translateY(-2px); }
         
-        /* Resultado */
         .resultado { margin-top: 25px; padding: 25px; background: var(--input-bg); border-radius: 16px; border-left: 4px solid var(--accent); display: none; }
         .resultado.show { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Lista */
         .lista-palavras { max-height: 400px; overflow-y: auto; }
-        .item-palavra { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; border-radius: 8px; }
+        .item-palavra { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: flex-start; transition: 0.3s; border-radius: 8px; }
         .item-palavra:hover { background: var(--input-bg); }
         .badge { background: var(--accent); color: white; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-right: 5px; }
         .btn-remover { background: var(--error); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .nota-gramatical { background: var(--warning); color: white; padding: 8px 12px; border-radius: 8px; font-size: 13px; margin-top: 8px; }
         
-        /* Painéis */
         .painel { display: none; }
         .painel.active { display: block; }
         
-        /* Modal de Login */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 1000; animation: fadeIn 0.3s ease; }
         .modal-overlay.show { display: flex; }
-        .modal {
-            background: var(--bg-card);
-            padding: 40px;
-            border-radius: 24px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: var(--shadow);
-        }
+        .modal { background: var(--bg-card); padding: 40px; border-radius: 24px; max-width: 400px; width: 90%; box-shadow: var(--shadow); }
         .modal h2 { margin-bottom: 20px; text-align: center; }
         .auth-tabs { display: flex; margin-bottom: 20px; background: var(--input-bg); border-radius: 12px; padding: 5px; border: 2px solid var(--border-color); }
         .auth-tab { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; border-radius: 8px; font-weight: 600; color: var(--text-secondary); transition: 0.3s; }
@@ -92,21 +71,31 @@
         
         .hidden { display: none !important; }
         
-        /* Banner de aviso */
-        .login-banner {
-            background: var(--accent);
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        .login-banner a {
-            color: white;
-            font-weight: 700;
-            text-decoration: underline;
-            cursor: pointer;
+        .login-banner { background: var(--accent); color: white; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-size: 14px; }
+        .login-banner a { color: white; font-weight: 700; text-decoration: underline; cursor: pointer; }
+        
+        /* Estilos específicos para correção gramatical */
+        .correcao-resultado { background: var(--input-bg); padding: 20px; border-radius: 12px; margin-top: 20px; }
+        .texto-corrigido { font-size: 18px; padding: 15px; background: var(--success); color: white; border-radius: 8px; margin-bottom: 15px; }
+        .sugestao-item { padding: 10px; border-bottom: 1px solid var(--border-color); }
+        .sugestao-item:last-child { border-bottom: none; }
+        .sugestao-mensagem { color: var(--error); font-weight: 600; margin-bottom: 5px; }
+        .sugestao-contexto { color: var(--text-muted); font-size: 13px; margin-bottom: 5px; }
+        .sugestao-replacements { display: flex; gap: 8px; flex-wrap: wrap; }
+        .sugestao-btn { background: var(--accent); color: white; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        
+        /* Estilos para biblioteca gramatical */
+        .gramatica-card { background: var(--input-bg); padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid var(--accent); }
+        .gramatica-card h3 { color: var(--accent); margin-bottom: 10px; }
+        .gramatica-card p { color: var(--text-secondary); line-height: 1.6; }
+        .gramatica-card ul { margin-left: 20px; margin-top: 10px; color: var(--text-secondary); }
+        .gramatica-card li { margin-bottom: 5px; }
+        
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            h1 { font-size: 24px; }
+            .tabs { flex-direction: column; }
+            .tab { min-width: 100%; }
         }
     </style>
 </head>
@@ -125,10 +114,9 @@
             </div>
         </div>
         
-        <!-- Banner para usuários não logados -->
         {% if not current_user.is_authenticated %}
             <div class="login-banner">
-                💡 Faça login para salvar suas traduções no seu dicionário pessoal! 
+                💡 Faça login para salvar suas traduções e notas gramaticais! 
                 <a onclick="abrirModal()">Clique aqui</a>
             </div>
         {% endif %}
@@ -136,6 +124,8 @@
         <!-- TABS -->
         <div class="tabs">
             <button class="tab active" onclick="mudarPainel('traduzir', this)">🔍 Traduzir</button>
+            <button class="tab" onclick="mudarPainel('corrigir', this)">✏️ Corrigir</button>
+            <button class="tab" onclick="mudarPainel('gramatica', this)"> Gramática</button>
             
             {% if current_user.is_authenticated %}
                 <button class="tab" onclick="mudarPainel('adicionar', this)">➕ Adicionar</button>
@@ -143,16 +133,16 @@
             {% endif %}
         </div>
 
-        <!-- PAINEL DE TRADUÇÃO (SEMPRE VISÍVEL) -->
+        <!-- PAINEL DE TRADUÇÃO -->
         <div id="painel-traduzir" class="painel active">
             <div class="form-group"><label>Palavra em Português</label><input type="text" id="palavra-traduzir" placeholder="Digite uma palavra..."></div>
             <div class="form-group"><label>Idioma Alvo</label>
                 <select id="idioma-traduzir">
-                    <option value="en">🇺 Inglês</option>
+                    <option value="en">🇺🇸 Inglês</option>
                     <option value="es">🇪🇸 Espanhol</option>
                     <option value="fr">🇫 Francês</option>
                     <option value="de">🇩🇪 Alemão</option>
-                    <option value="it">🇹 Italiano</option>
+                    <option value="it">🇮🇹 Italiano</option>
                 </select>
             </div>
             <button class="submit" onclick="fazerTraducao()">Traduzir</button>
@@ -162,19 +152,112 @@
             </div>
         </div>
 
+        <!-- PAINEL DE CORREÇÃO GRAMATICAL -->
+        <div id="painel-corrigir" class="painel">
+            <div class="form-group">
+                <label>Texto para Corrigir</label>
+                <textarea id="texto-corrigir" placeholder="Digite seu texto em português, inglês, espanhol, etc..."></textarea>
+            </div>
+            <div class="form-group"><label>Idioma do Texto</label>
+                <select id="idioma-corrigir">
+                    <option value="pt-BR">🇧🇷 Português (Brasil)</option>
+                    <option value="en-US">🇺🇸 Inglês (EUA)</option>
+                    <option value="es">🇪🇸 Espanhol</option>
+                    <option value="fr">🇷 Francês</option>
+                    <option value="de">🇩🇪 Alemão</option>
+                </select>
+            </div>
+            <button class="submit" onclick="fazerCorrecao()">Corrigir Gramática</button>
+            <div id="resultado-correcao" class="resultado"></div>
+        </div>
+
+        <!-- PAINEL DE BIBLIOTECA GRAMATICAL -->
+        <div id="painel-gramatica" class="painel">
+            <h2 style="margin-bottom: 20px; color: var(--accent);">📚 Biblioteca Gramatical</h2>
+            
+            <div class="gramatica-card">
+                <h3>🇺🇸 Inglês: Make vs Do</h3>
+                <p><strong>Make</strong> é usado para criar ou produzir algo:</p>
+                <ul>
+                    <li>Make a cake (fazer um bolo)</li>
+                    <li>Make a decision (tomar uma decisão)</li>
+                    <li>Make money (ganhar dinheiro)</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>Do</strong> é usado para ações e atividades:</p>
+                <ul>
+                    <li>Do homework (fazer lição de casa)</li>
+                    <li>Do exercise (fazer exercício)</li>
+                    <li>Do your best (fazer o seu melhor)</li>
+                </ul>
+            </div>
+
+            <div class="gramatica-card">
+                <h3>🇺🇸 Inglês: Present Perfect</h3>
+                <p>Usado para ações que começaram no passado e continuam no presente, ou que têm relevância no momento atual.</p>
+                <p style="margin-top: 10px;"><strong>Estrutura:</strong> Sujeito + have/has + verbo no particípio</p>
+                <ul>
+                    <li>I have studied English for 5 years.</li>
+                    <li>She has visited Paris twice.</li>
+                    <li>They have finished the project.</li>
+                </ul>
+            </div>
+
+            <div class="gramatica-card">
+                <h3>🇪🇸 Espanhol: Ser vs Estar</h3>
+                <p><strong>Ser</strong> é usado para características permanentes:</p>
+                <ul>
+                    <li>Soy alto (sou alto)</li>
+                    <li>Es médico (é médico)</li>
+                    <li>Son amigos (são amigos)</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>Estar</strong> é usado para estados temporários e localização:</p>
+                <ul>
+                    <li>Estoy cansado (estou cansado)</li>
+                    <li>Está en casa (está em casa)</li>
+                    <li>Estamos felices (estamos felizes)</li>
+                </ul>
+            </div>
+
+            <div class="gramatica-card">
+                <h3>🇫🇷 Francês: Artigos Definidos</h3>
+                <p>Os artigos definidos em francês variam por gênero e número:</p>
+                <ul>
+                    <li><strong>le</strong> (masculino singular): le livre (o livro)</li>
+                    <li><strong>la</strong> (feminino singular): la maison (a casa)</li>
+                    <li><strong>l'</strong> (antes de vogal): l'ami (o amigo)</li>
+                    <li><strong>les</strong> (plural): les enfants (as crianças)</li>
+                </ul>
+            </div>
+
+            <div class="gramatica-card">
+                <h3>🇷 Português: Crase</h3>
+                <p>A crase é a fusão da preposição "a" com o artigo feminino "a" ou com pronomes demonstrativos.</p>
+                <p style="margin-top: 10px;"><strong>Regra básica:</strong> Use crase quando puder substituir por "ao" (masculino).</p>
+                <ul>
+                    <li>Vou à escola (vou ao colégio) ✓</li>
+                    <li>Fui à praia ontem ✓</li>
+                    <li>Entreguei o documento à secretária ✓</li>
+                </ul>
+            </div>
+        </div>
+
         <!-- PAINEL DE ADICIONAR (SÓ LOGADOS) -->
         {% if current_user.is_authenticated %}
         <div id="painel-adicionar" class="painel">
             <div class="form-group"><label>Palavra em Português</label><input type="text" id="palavra-add" placeholder="Ex: Programação"></div>
             <div class="form-group"><label>Idioma</label>
                 <select id="idioma-add">
-                    <option value="en">🇸 Inglês</option>
-                    <option value="es">🇪🇸 Espanhol</option>
+                    <option value="en">🇺🇸 Inglês</option>
+                    <option value="es">🇪 Espanhol</option>
                     <option value="fr">🇫🇷 Francês</option>
-                    <option value="de">🇩 Alemão</option>
+                    <option value="de">🇩🇪 Alemão</option>
                 </select>
             </div>
             <div class="form-group"><label>Tradução</label><input type="text" id="trad-add" placeholder="Ex: Programming"></div>
+            <div class="form-group">
+                <label>📝 Nota Gramatical (opcional)</label>
+                <textarea id="nota-add" placeholder="Ex: Usado para criar coisas, não confundir com Do. Sempre seguido de substantivo."></textarea>
+            </div>
             <button class="submit" onclick="fazerAdicao()">Salvar no Dicionário</button>
             <div id="resultado-add" class="resultado"><h3 id="texto-add"></h3></div>
         </div>
@@ -190,8 +273,8 @@
     <!-- MODAL DE LOGIN/CADASTRO -->
     <div id="modal-auth" class="modal-overlay">
         <div class="modal" style="position: relative;">
-            <button class="close-modal" onclick="fecharModal()"></button>
-            <h2> Acesso</h2>
+            <button class="close-modal" onclick="fecharModal()">×</button>
+            <h2>🔐 Acesso</h2>
             
             <div class="auth-tabs">
                 <button class="auth-tab active" onclick="toggleAuth('login')">Entrar</button>
@@ -215,12 +298,8 @@
     </div>
 
     <script>
-        // Modal de Login
-        function abrirModal() {
-            document.getElementById('modal-auth').classList.add('show');
-        }
-        
-        function fecharModal() {
+        function abrirModal() { document.getElementById('modal-auth').classList.add('show'); }
+        function fecharModal() { 
             document.getElementById('modal-auth').classList.remove('show');
             document.getElementById('msg-login').textContent = '';
             document.getElementById('msg-reg').textContent = '';
@@ -258,7 +337,6 @@
             location.reload();
         }
 
-        // Navegação de painéis
         function mudarPainel(painel, btn) {
             document.querySelectorAll('.painel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -267,21 +345,13 @@
             if (painel === 'listar') carregarLista();
         }
 
-        // Tradução (funciona para todos)
         async function fazerTraducao() {
             const palavra = document.getElementById('palavra-traduzir').value.trim();
             const idioma = document.getElementById('idioma-traduzir').value;
             
-            if (!palavra) {
-                alert('Digite uma palavra!');
-                return;
-            }
+            if (!palavra) { alert('Digite uma palavra!'); return; }
             
-            const res = await fetch('/traduzir', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({palavra, idioma}) 
-            });
+            const res = await fetch('/traduzir', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({palavra, idioma}) });
             const data = await res.json();
             
             document.getElementById('texto-traducao').textContent = data.erro ? '❌ ' + data.erro : `"${palavra}" → "${data.traducao}"`;
@@ -289,29 +359,81 @@
             document.getElementById('resultado-traducao').classList.add('show');
         }
 
-        // Adicionar (só logados)
+        async function fazerCorrecao() {
+            const texto = document.getElementById('texto-corrigir').value.trim();
+            const idioma = document.getElementById('idioma-corrigir').value;
+            
+            if (!texto) { alert('Digite um texto para corrigir!'); return; }
+            
+            const resultadoDiv = document.getElementById('resultado-correcao');
+            resultadoDiv.innerHTML = '<p style="text-align: center;">✏️ Corrigindo...</p>';
+            resultadoDiv.classList.add('show');
+            
+            const res = await fetch('/corrigir', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({texto, idioma}) });
+            const data = await res.json();
+            
+            if (data.erro) {
+                resultadoDiv.innerHTML = `<p style="color: var(--error);">❌ ${data.erro}</p>`;
+                return;
+            }
+            
+            let html = '<div class="correcao-resultado">';
+            
+            if (data.erros_encontrados === 0) {
+                html += '<div class="texto-corrigido">✅ Texto correto! Nenhum erro gramatical encontrado.</div>';
+            } else {
+                html += `<h3 style="margin-bottom: 15px;">📝 Texto Corrigido (${data.erros_encontrados} erros encontrados):</h3>`;
+                html += `<div class="texto-corrigido">${data.texto_corrigido}</div>`;
+                
+                if (data.sugestoes && data.sugestoes.length > 0) {
+                    html += '<h3 style="margin-bottom: 15px;">💡 Sugestões de Correção:</h3>';
+                    data.sugestoes.forEach(sug => {
+                        html += '<div class="sugestao-item">';
+                        html += `<div class="sugestao-mensagem">${sug.mensagem}</div>`;
+                        html += `<div class="sugestao-contexto">Contexto: "${sug.contexto}"</div>`;
+                        if (sug.replacements && sug.replacements.length > 0) {
+                            html += '<div class="sugestao-replacements">';
+                            html += '<strong>Sugestões:</strong> ';
+                            sug.replacements.forEach(rep => {
+                                html += `<button class="sugestao-btn" onclick="aplicarSugestao('${rep}')">${rep}</button>`;
+                            });
+                            html += '</div>';
+                        }
+                        html += '</div>';
+                    });
+                }
+            }
+            
+            html += '</div>';
+            resultadoDiv.innerHTML = html;
+        }
+
+        function aplicarSugestao(sugestao) {
+            const textarea = document.getElementById('texto-corrigir');
+            textarea.value = sugestao;
+            fazerCorrecao();
+        }
+
         async function fazerAdicao() {
             const palavra = document.getElementById('palavra-add').value.trim();
             const idioma = document.getElementById('idioma-add').value;
             const traducao = document.getElementById('trad-add').value.trim();
+            const nota = document.getElementById('nota-add').value.trim();
             
-            if (!palavra || !idioma || !traducao) {
-                alert('Preencha todos os campos!');
-                return;
-            }
+            if (!palavra || !idioma || !traducao) { alert('Preencha todos os campos obrigatórios!'); return; }
             
-            const res = await fetch('/adicionar', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({palavra, idioma, traducao}) 
-            });
+            const res = await fetch('/adicionar', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({palavra, idioma, traducao, nota}) });
             const data = await res.json();
             
             document.getElementById('texto-add').textContent = data.erro ? '❌ ' + data.erro : '✅ ' + data.sucesso;
             document.getElementById('resultado-add').classList.add('show');
+            
+            // Limpar campos
+            document.getElementById('palavra-add').value = '';
+            document.getElementById('trad-add').value = '';
+            document.getElementById('nota-add').value = '';
         }
 
-        // Listar (só logados)
         async function carregarLista() {
             const res = await fetch('/listar');
             const dados = await res.json();
@@ -322,24 +444,29 @@
                 return; 
             }
             
-            container.innerHTML = dados.map(item => `
-                <div class="item-palavra">
-                    <div>
-                        <strong>${item.palavra}</strong><br>
-                        <small>${Object.keys(item.traducoes).map(i => `<span class="badge">${i}</span>`).join('')}</small>
+            container.innerHTML = dados.map(item => {
+                let html = `
+                    <div class="item-palavra">
+                        <div style="flex: 1;">
+                            <strong>${item.palavra}</strong><br>
+                            <small>${Object.keys(item.traducoes).map(i => `<span class="badge">${i}: ${item.traducoes[i]}</span>`).join(' ')}</small>
+                `;
+                
+                if (item.nota_gramatical) {
+                    html += `<div class="nota-gramatical">📝 ${item.nota_gramatical}</div>`;
+                }
+                
+                html += `</div>
+                        <button class="btn-remover" onclick="remover('${item.palavra}')">🗑️</button>
                     </div>
-                    <button class="btn-remover" onclick="remover('${item.palavra}')">🗑️</button>
-                </div>
-            `).join('');
+                `;
+                return html;
+            }).join('');
         }
 
         async function remover(palavra) {
             if(!confirm('Remover "' + palavra + '" do seu dicionário?')) return;
-            await fetch('/remover', { 
-                method: 'POST', 
-                headers: {'Content-Type': 'application/json'}, 
-                body: JSON.stringify({palavra}) 
-            });
+            await fetch('/remover', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({palavra}) });
             carregarLista();
         }
 
@@ -364,12 +491,10 @@
             `).join('');
         }
 
-        // Enter para traduzir
         document.getElementById('palavra-traduzir').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') fazerTraducao();
         });
 
-        // Fechar modal ao clicar fora
         document.getElementById('modal-auth').addEventListener('click', function(e) {
             if (e.target === this) fecharModal();
         });
