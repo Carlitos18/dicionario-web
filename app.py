@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'sua_chave_secreta_super_segura_aqui'  # Mude isso em produção!
+app.config['SECRET_KEY'] = '2969d9b90e756e1aa410b98f9d611a697921eea758f73ace542cc1d5d4a0dbec'  # Mude isso em produção!
 
 # Configuração do banco de dados
 basedir = os.path.abspath(os.path.dirname(__file__))
