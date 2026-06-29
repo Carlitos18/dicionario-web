@@ -74,7 +74,6 @@
         .login-banner { background: var(--accent); color: white; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-size: 14px; }
         .login-banner a { color: white; font-weight: 700; text-decoration: underline; cursor: pointer; }
         
-        /* Estilos específicos para correção gramatical */
         .correcao-resultado { background: var(--input-bg); padding: 20px; border-radius: 12px; margin-top: 20px; }
         .texto-corrigido { font-size: 18px; padding: 15px; background: var(--success); color: white; border-radius: 8px; margin-bottom: 15px; }
         .sugestao-item { padding: 10px; border-bottom: 1px solid var(--border-color); }
@@ -84,74 +83,37 @@
         .sugestao-replacements { display: flex; gap: 8px; flex-wrap: wrap; }
         .sugestao-btn { background: var(--accent); color: white; border: none; padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; }
         
-        /* Estilos para biblioteca gramatical */
-        .gramatica-card { background: var(--input-bg); padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid var(--accent); }
-        .gramatica-card h3 { color: var(--accent); margin-bottom: 10px; }
-        .gramatica-card p { color: var(--text-secondary); line-height: 1.6; }
-        .gramatica-card ul { margin-left: 20px; margin-top: 10px; color: var(--text-secondary); }
-        .gramatica-card li { margin-bottom: 5px; }
+        .gramatica-controls { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        .gramatica-search { flex: 1; min-width: 250px; }
+        .gramatica-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filtro-btn { padding: 8px 16px; border: 2px solid var(--border-color); background: var(--input-bg); color: var(--text-secondary); border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.3s; }
+        .filtro-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .filtro-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
         
-        /* Estilos do Mini-Teste (Quiz) */
-        .quiz-section {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px dashed var(--border-color);
-        }
-        .quiz-section h4 {
-            color: var(--accent);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .quiz-pergunta {
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text-primary);
-        }
-        .quiz-opcoes {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .quiz-btn {
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            background: var(--input-bg);
-            color: var(--text-primary);
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: left;
-            font-size: 14px;
-            transition: 0.3s;
-            font-family: inherit;
-        }
-        .quiz-btn:hover:not(:disabled) {
-            border-color: var(--accent);
-            background: rgba(102, 126, 234, 0.05);
-        }
-        .quiz-btn.correta {
-            border-color: var(--success);
-            background: rgba(72, 187, 120, 0.15);
-            color: var(--success);
-            font-weight: bold;
-        }
-        .quiz-btn.errada {
-            border-color: var(--error);
-            background: rgba(245, 101, 101, 0.15);
-            color: var(--error);
-            opacity: 0.7;
-        }
-        .quiz-btn:disabled {
-            cursor: default;
-        }
-        .quiz-feedback {
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 14px;
-            min-height: 20px;
-        }
-
+        .gramatica-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .gramatica-card { background: var(--input-bg); border-radius: 12px; border: 1px solid var(--border-color); overflow: hidden; transition: 0.3s; }
+        .gramatica-card:hover { transform: translateY(-3px); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .gramatica-header { padding: 15px 20px; background: rgba(102, 126, 234, 0.05); cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); }
+        .gramatica-header h3 { margin: 0; font-size: 16px; color: var(--text-primary); }
+        .gramatica-header .toggle-icon { font-size: 20px; transition: 0.3s; color: var(--accent); }
+        .gramatica-card.expanded .toggle-icon { transform: rotate(180deg); }
+        .gramatica-body { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.4s ease; color: var(--text-secondary); line-height: 1.6; }
+        .gramatica-card.expanded .gramatica-body { padding: 20px; max-height: 1000px; }
+        .gramatica-body ul { margin: 10px 0 10px 20px; }
+        .gramatica-body li { margin-bottom: 5px; }
+        .empty-state { text-align: center; padding: 40px; color: var(--text-muted); grid-column: 1 / -1; }
+        
+        .quiz-section { margin-top: 20px; padding-top: 15px; border-top: 2px dashed var(--border-color); }
+        .quiz-section h4 { color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .quiz-pergunta { font-weight: 600; margin-bottom: 12px; color: var(--text-primary); }
+        .quiz-opcoes { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-btn { padding: 12px; border: 2px solid var(--border-color); background: var(--input-bg); color: var(--text-primary); border-radius: 8px; cursor: pointer; text-align: left; font-size: 14px; transition: 0.3s; font-family: inherit; }
+        .quiz-btn:hover:not(:disabled) { border-color: var(--accent); background: rgba(102, 126, 234, 0.05); }
+        .quiz-btn.correta { border-color: var(--success); background: rgba(72, 187, 120, 0.15); color: var(--success); font-weight: bold; }
+        .quiz-btn.errada { border-color: var(--error); background: rgba(245, 101, 101, 0.15); color: var(--error); opacity: 0.7; }
+        .quiz-btn:disabled { cursor: default; }
+        .quiz-feedback { margin-top: 10px; font-weight: bold; font-size: 14px; min-height: 20px; }
+        
         @media (max-width: 768px) {
             .container { padding: 20px; }
             h1 { font-size: 24px; }
@@ -162,7 +124,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- HEADER -->
         <div class="header">
             <h1>🌍 Dicionário Web</h1>
             <div class="user-info">
@@ -182,11 +143,10 @@
             </div>
         {% endif %}
         
-        <!-- TABS -->
         <div class="tabs">
             <button class="tab active" onclick="mudarPainel('traduzir', this)">🔍 Traduzir</button>
             <button class="tab" onclick="mudarPainel('corrigir', this)">✏️ Corrigir</button>
-            <button class="tab" onclick="mudarPainel('gramatica', this)"> Gramática</button>
+            <button class="tab" onclick="mudarPainel('gramatica', this)">📚 Gramática</button>
             
             {% if current_user.is_authenticated %}
                 <button class="tab" onclick="mudarPainel('adicionar', this)">➕ Adicionar</button>
@@ -194,14 +154,13 @@
             {% endif %}
         </div>
 
-        <!-- PAINEL DE TRADUÇÃO -->
         <div id="painel-traduzir" class="painel active">
             <div class="form-group"><label>Palavra em Português</label><input type="text" id="palavra-traduzir" placeholder="Digite uma palavra..."></div>
             <div class="form-group"><label>Idioma Alvo</label>
                 <select id="idioma-traduzir">
                     <option value="en">🇺🇸 Inglês</option>
                     <option value="es">🇪🇸 Espanhol</option>
-                    <option value="fr">🇫 Francês</option>
+                    <option value="fr">🇫🇷 Francês</option>
                     <option value="de">🇩🇪 Alemão</option>
                     <option value="it">🇮🇹 Italiano</option>
                 </select>
@@ -213,18 +172,17 @@
             </div>
         </div>
 
-        <!-- PAINEL DE CORREÇÃO GRAMATICAL -->
         <div id="painel-corrigir" class="painel">
             <div class="form-group">
                 <label>Texto para Corrigir</label>
-                <textarea id="texto-corrigir" placeholder="Digite seu texto em português, inglês, espanhol, etc..."></textarea>
+                <textarea id="texto-corrigir" placeholder="Digite seu texto..."></textarea>
             </div>
             <div class="form-group"><label>Idioma do Texto</label>
                 <select id="idioma-corrigir">
                     <option value="pt-BR">🇧🇷 Português (Brasil)</option>
                     <option value="en-US">🇺🇸 Inglês (EUA)</option>
                     <option value="es">🇪🇸 Espanhol</option>
-                    <option value="fr">🇷 Francês</option>
+                    <option value="fr">🇫🇷 Francês</option>
                     <option value="de">🇩🇪 Alemão</option>
                 </select>
             </div>
@@ -232,84 +190,32 @@
             <div id="resultado-correcao" class="resultado"></div>
         </div>
 
-        <!-- PAINEL DE BIBLIOTECA GRAMATICAL -->
         <div id="painel-gramatica" class="painel">
             <h2 style="margin-bottom: 20px; color: var(--accent);">📚 Biblioteca Gramatical</h2>
             
-            <div class="gramatica-card">
-                <h3>🇺🇸 Inglês: Make vs Do</h3>
-                <p><strong>Make</strong> é usado para criar ou produzir algo:</p>
-                <ul>
-                    <li>Make a cake (fazer um bolo)</li>
-                    <li>Make a decision (tomar uma decisão)</li>
-                    <li>Make money (ganhar dinheiro)</li>
-                </ul>
-                <p style="margin-top: 10px;"><strong>Do</strong> é usado para ações e atividades:</p>
-                <ul>
-                    <li>Do homework (fazer lição de casa)</li>
-                    <li>Do exercise (fazer exercício)</li>
-                    <li>Do your best (fazer o seu melhor)</li>
-                </ul>
+            <div class="gramatica-controls">
+                <div class="gramatica-search">
+                    <input type="text" id="buscar-gramatica" placeholder="🔍 Buscar regra...">
+                </div>
+                <div class="gramatica-filters">
+                    <button class="filtro-btn active" data-lang="all">Todos</button>
+                    <button class="filtro-btn" data-lang="en">🇺🇸 Inglês</button>
+                    <button class="filtro-btn" data-lang="es">🇪🇸 Espanhol</button>
+                    <button class="filtro-btn" data-lang="fr">🇫🇷 Francês</button>
+                    <button class="filtro-btn" data-lang="pt">🇧🇷 Português</button>
+                </div>
             </div>
 
-            <div class="gramatica-card">
-                <h3>🇺🇸 Inglês: Present Perfect</h3>
-                <p>Usado para ações que começaram no passado e continuam no presente, ou que têm relevância no momento atual.</p>
-                <p style="margin-top: 10px;"><strong>Estrutura:</strong> Sujeito + have/has + verbo no particípio</p>
-                <ul>
-                    <li>I have studied English for 5 years.</li>
-                    <li>She has visited Paris twice.</li>
-                    <li>They have finished the project.</li>
-                </ul>
-            </div>
-
-            <div class="gramatica-card">
-                <h3>🇪🇸 Espanhol: Ser vs Estar</h3>
-                <p><strong>Ser</strong> é usado para características permanentes:</p>
-                <ul>
-                    <li>Soy alto (sou alto)</li>
-                    <li>Es médico (é médico)</li>
-                    <li>Son amigos (são amigos)</li>
-                </ul>
-                <p style="margin-top: 10px;"><strong>Estar</strong> é usado para estados temporários e localização:</p>
-                <ul>
-                    <li>Estoy cansado (estou cansado)</li>
-                    <li>Está en casa (está em casa)</li>
-                    <li>Estamos felices (estamos felizes)</li>
-                </ul>
-            </div>
-
-            <div class="gramatica-card">
-                <h3>🇫🇷 Francês: Artigos Definidos</h3>
-                <p>Os artigos definidos em francês variam por gênero e número:</p>
-                <ul>
-                    <li><strong>le</strong> (masculino singular): le livre (o livro)</li>
-                    <li><strong>la</strong> (feminino singular): la maison (a casa)</li>
-                    <li><strong>l'</strong> (antes de vogal): l'ami (o amigo)</li>
-                    <li><strong>les</strong> (plural): les enfants (as crianças)</li>
-                </ul>
-            </div>
-
-            <div class="gramatica-card">
-                <h3>🇷 Português: Crase</h3>
-                <p>A crase é a fusão da preposição "a" com o artigo feminino "a" ou com pronomes demonstrativos.</p>
-                <p style="margin-top: 10px;"><strong>Regra básica:</strong> Use crase quando puder substituir por "ao" (masculino).</p>
-                <ul>
-                    <li>Vou à escola (vou ao colégio) ✓</li>
-                    <li>Fui à praia ontem ✓</li>
-                    <li>Entreguei o documento à secretária ✓</li>
-                </ul>
-            </div>
+            <div id="lista-gramatica" class="gramatica-container"></div>
         </div>
 
-        <!-- PAINEL DE ADICIONAR (SÓ LOGADOS) -->
         {% if current_user.is_authenticated %}
         <div id="painel-adicionar" class="painel">
             <div class="form-group"><label>Palavra em Português</label><input type="text" id="palavra-add" placeholder="Ex: Programação"></div>
             <div class="form-group"><label>Idioma</label>
                 <select id="idioma-add">
                     <option value="en">🇺🇸 Inglês</option>
-                    <option value="es">🇪 Espanhol</option>
+                    <option value="es">🇪🇸 Espanhol</option>
                     <option value="fr">🇫🇷 Francês</option>
                     <option value="de">🇩🇪 Alemão</option>
                 </select>
@@ -317,13 +223,12 @@
             <div class="form-group"><label>Tradução</label><input type="text" id="trad-add" placeholder="Ex: Programming"></div>
             <div class="form-group">
                 <label>📝 Nota Gramatical (opcional)</label>
-                <textarea id="nota-add" placeholder="Ex: Usado para criar coisas, não confundir com Do. Sempre seguido de substantivo."></textarea>
+                <textarea id="nota-add" placeholder="Ex: Usado para criar coisas..."></textarea>
             </div>
             <button class="submit" onclick="fazerAdicao()">Salvar no Dicionário</button>
             <div id="resultado-add" class="resultado"><h3 id="texto-add"></h3></div>
         </div>
 
-        <!-- PAINEL DE LISTAR (SÓ LOGADOS) -->
         <div id="painel-listar" class="painel">
             <div class="form-group"><input type="text" id="buscar" placeholder="🔍 Buscar palavra..." onkeyup="buscarPalavras()"></div>
             <div id="lista" class="lista-palavras"></div>
@@ -331,7 +236,6 @@
         {% endif %}
     </div>
 
-    <!-- MODAL DE LOGIN/CADASTRO -->
     <div id="modal-auth" class="modal-overlay">
         <div class="modal" style="position: relative;">
             <button class="close-modal" onclick="fecharModal()">×</button>
@@ -359,6 +263,10 @@
     </div>
 
     <script>
+        // Variáveis globais da gramática
+        let todasRegras = [];
+        let filtroIdiomaAtual = 'all';
+
         function abrirModal() { document.getElementById('modal-auth').classList.add('show'); }
         function fecharModal() { 
             document.getElementById('modal-auth').classList.remove('show');
@@ -403,7 +311,9 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById('painel-' + painel).classList.add('active');
             btn.classList.add('active');
+            
             if (painel === 'listar') carregarLista();
+            if (painel === 'gramatica') carregarGramatica();
         }
 
         async function fazerTraducao() {
@@ -441,20 +351,19 @@
             let html = '<div class="correcao-resultado">';
             
             if (data.erros_encontrados === 0) {
-                html += '<div class="texto-corrigido">✅ Texto correto! Nenhum erro gramatical encontrado.</div>';
+                html += '<div class="texto-corrigido">✅ Texto correto!</div>';
             } else {
-                html += `<h3 style="margin-bottom: 15px;">📝 Texto Corrigido (${data.erros_encontrados} erros encontrados):</h3>`;
+                html += `<h3 style="margin-bottom: 15px;">📝 Texto Corrigido (${data.erros_encontrados} erros):</h3>`;
                 html += `<div class="texto-corrigido">${data.texto_corrigido}</div>`;
                 
                 if (data.sugestoes && data.sugestoes.length > 0) {
-                    html += '<h3 style="margin-bottom: 15px;">💡 Sugestões de Correção:</h3>';
+                    html += '<h3 style="margin-bottom: 15px;">💡 Sugestões:</h3>';
                     data.sugestoes.forEach(sug => {
                         html += '<div class="sugestao-item">';
                         html += `<div class="sugestao-mensagem">${sug.mensagem}</div>`;
                         html += `<div class="sugestao-contexto">Contexto: "${sug.contexto}"</div>`;
                         if (sug.replacements && sug.replacements.length > 0) {
                             html += '<div class="sugestao-replacements">';
-                            html += '<strong>Sugestões:</strong> ';
                             sug.replacements.forEach(rep => {
                                 html += `<button class="sugestao-btn" onclick="aplicarSugestao('${rep}')">${rep}</button>`;
                             });
@@ -470,8 +379,7 @@
         }
 
         function aplicarSugestao(sugestao) {
-            const textarea = document.getElementById('texto-corrigir');
-            textarea.value = sugestao;
+            document.getElementById('texto-corrigir').value = sugestao;
             fazerCorrecao();
         }
 
@@ -481,7 +389,7 @@
             const traducao = document.getElementById('trad-add').value.trim();
             const nota = document.getElementById('nota-add').value.trim();
             
-            if (!palavra || !idioma || !traducao) { alert('Preencha todos os campos obrigatórios!'); return; }
+            if (!palavra || !idioma || !traducao) { alert('Preencha todos os campos!'); return; }
             
             const res = await fetch('/adicionar', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({palavra, idioma, traducao, nota}) });
             const data = await res.json();
@@ -489,7 +397,6 @@
             document.getElementById('texto-add').textContent = data.erro ? '❌ ' + data.erro : '✅ ' + data.sucesso;
             document.getElementById('resultado-add').classList.add('show');
             
-            // Limpar campos
             document.getElementById('palavra-add').value = '';
             document.getElementById('trad-add').value = '';
             document.getElementById('nota-add').value = '';
@@ -501,7 +408,7 @@
             const container = document.getElementById('lista');
             
             if (!dados.length) { 
-                container.innerHTML = '<p style="text-align:center; color:var(--text-muted)">Nenhuma palavra no seu dicionário</p>'; 
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted)">Nenhuma palavra</p>'; 
                 return; 
             }
             
@@ -526,7 +433,7 @@
         }
 
         async function remover(palavra) {
-            if(!confirm('Remover "' + palavra + '" do seu dicionário?')) return;
+            if(!confirm('Remover "' + palavra + '"?')) return;
             await fetch('/remover', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({palavra}) });
             carregarLista();
         }
@@ -540,7 +447,7 @@
             
             const container = document.getElementById('lista');
             if (!dados.length) { 
-                container.innerHTML = '<p style="text-align:center; color:var(--text-muted)">Nenhuma palavra encontrada</p>'; 
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted)">Nenhuma encontrada</p>'; 
                 return; 
             }
             
@@ -552,15 +459,24 @@
             `).join('');
         }
 
-        document.getElementById('palavra-traduzir').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') fazerTraducao();
-        });
+        // ==========================================
+        // BIBLIOTECA GRAMATICAL COM QUIZ
+        // ==========================================
+        
+        async function carregarGramatica() {
+            const container = document.getElementById('lista-gramatica');
+            container.innerHTML = '<p class="empty-state">Carregando...</p>';
+            
+            try {
+                const res = await fetch('/api/gramatica');
+                todasRegras = await res.json();
+                renderizarGramatica();
+            } catch (error) {
+                container.innerHTML = '<p class="empty-state" style="color: var(--error);">Erro ao carregar.</p>';
+            }
+        }
 
-        document.getElementById('modal-auth').addEventListener('click', function(e) {
-            if (e.target === this) fecharModal();
-        });
-
-                function renderizarGramatica() {
+        function renderizarGramatica() {
             const container = document.getElementById('lista-gramatica');
             const termoBusca = document.getElementById('buscar-gramatica').value.toLowerCase().trim();
             
@@ -572,33 +488,29 @@
             });
 
             if (regrasFiltradas.length === 0) {
-                container.innerHTML = '<p class="empty-state">Nenhuma regra encontrada com esses filtros.</p>';
+                container.innerHTML = '<p class="empty-state">Nenhuma regra encontrada.</p>';
                 return;
             }
 
-            container.innerHTML = regrasFiltradas.map(regra => {
-                // Lógica do Quiz (se existir)
+            container.innerHTML = regrasFiltradas.map((regra, idx) => {
                 let quizHTML = '';
                 if (regra.quiz) {
-                    const opcoesHTML = regra.quiz.opcoes.map((opcao, index) => 
-                        `<button class="quiz-btn" onclick="event.stopPropagation(); verificarResposta(this, ${index}, ${regra.quiz.correta})">${opcao}</button>`
+                    const opcoesHTML = regra.quiz.opcoes.map((opcao, idxOpcao) => 
+                        `<button class="quiz-btn" data-certa="${regra.quiz.correta}" data-selecionada="${idxOpcao}">${opcao}</button>`
                     ).join('');
                     
                     quizHTML = `
                         <div class="quiz-section">
                             <h4>✏️ Teste Rápido:</h4>
                             <p class="quiz-pergunta">${regra.quiz.pergunta}</p>
-                            <div class="quiz-opcoes">
-                                ${opcoesHTML}
-                            </div>
+                            <div class="quiz-opcoes">${opcoesHTML}</div>
                             <div class="quiz-feedback"></div>
                         </div>
                     `;
                 }
 
-                // Retorna o cartão completo
                 return `
-                    <div class="gramatica-card" onclick="this.classList.toggle('expanded')">
+                    <div class="gramatica-card">
                         <div class="gramatica-header">
                             <h3>${regra.titulo}</h3>
                             <span class="toggle-icon">▼</span>
@@ -613,13 +525,13 @@
             }).join('');
         }
 
-                function verificarResposta(btn, selecionada, correta) {
-            // Evita que o clique no botão feche o acordeão (graças ao stopPropagation no HTML)
+        function verificarResposta(btn, selecionada, correta) {
             const quizSection = btn.closest('.quiz-section');
             const botoes = quizSection.querySelectorAll('.quiz-btn');
             const feedback = quizSection.querySelector('.quiz-feedback');
 
-            // Desabilita todos os botões após a primeira tentativa
+            if (btn.disabled) return;
+
             botoes.forEach(b => b.disabled = true);
 
             if (selecionada === correta) {
@@ -628,12 +540,57 @@
                 feedback.style.color = 'var(--success)';
             } else {
                 btn.classList.add('errada');
-                // Destaca a resposta certa para o usuário aprender
                 botoes[correta].classList.add('correta');
-                feedback.textContent = '❌ Ops! A resposta correta está destacada em verde.';
+                feedback.textContent = '❌ Ops! A resposta correta está em verde.';
                 feedback.style.color = 'var(--error)';
             }
         }
+
+        // ==========================================
+        // EVENT LISTENERS
+        // ==========================================
+        
+        document.getElementById('palavra-traduzir').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') fazerTraducao();
+        });
+
+        document.getElementById('modal-auth').addEventListener('click', function(e) {
+            if (e.target === this) fecharModal();
+        });
+
+        // Event Delegation para Gramática (abrir/fechar cartões e quiz)
+        document.getElementById('lista-gramatica').addEventListener('click', function(e) {
+            // Clique no header para expandir/recolher
+            if (e.target.closest('.gramatica-header')) {
+                const card = e.target.closest('.gramatica-card');
+                card.classList.toggle('expanded');
+                return;
+            }
+            
+            // Clique em botão do quiz
+            if (e.target.classList.contains('quiz-btn')) {
+                e.stopPropagation();
+                const btn = e.target;
+                if (btn.disabled) return;
+                
+                const selecionada = parseInt(btn.getAttribute('data-selecionada'));
+                const correta = parseInt(btn.getAttribute('data-certa'));
+                verificarResposta(btn, selecionada, correta);
+            }
+        });
+
+        // Busca na gramática
+        document.getElementById('buscar-gramatica').addEventListener('input', renderizarGramatica);
+
+        // Filtros de idioma
+        document.querySelectorAll('.filtro-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                filtroIdiomaAtual = this.getAttribute('data-lang');
+                renderizarGramatica();
+            });
+        });
     </script>
 </body>
 </html>
